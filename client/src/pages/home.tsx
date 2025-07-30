@@ -1,0 +1,202 @@
+import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { isUnauthorizedError } from "@/lib/authUtils";
+import Navigation from "@/components/Navigation";
+import LoyaltyProgress from "@/components/LoyaltyProgress";
+import PunchCard from "@/components/PunchCard";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { QrCode, Gift, HardHat, Bell } from "lucide-react";
+import { Link } from "wouter";
+
+export default function Home() {
+  const { toast } = useToast();
+  const { user, isAuthenticated, isLoading } = useAuth();
+
+  const { data: transactions } = useQuery({
+    queryKey: ["/api/user/transactions"],
+    enabled: isAuthenticated,
+  });
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      toast({
+        title: "Unauthorized",
+        description: "You are logged out. Logging in again...",
+        variant: "destructive",
+      });
+      setTimeout(() => {
+        window.location.href = "/api/login";
+      }, 500);
+      return;
+    }
+  }, [isAuthenticated, isLoading, toast]);
+
+  if (isLoading || !user) {
+    return (
+      <div className="min-h-screen bg-slate-800 flex items-center justify-center">
+        <div className="text-center">
+          <HardHat className="w-12 h-12 text-orange-500 mx-auto mb-4 animate-pulse" />
+          <p className="text-white">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const getTierName = (tier: string) => {
+    switch (tier) {
+      case "apprentice": return "Apprentice";
+      case "tradie": return "Tradie";
+      case "foreman": return "Foreman";
+      default: return "Apprentice";
+    }
+  };
+
+  const getNextTierPoints = (tier: string, currentPoints: number) => {
+    switch (tier) {
+      case "apprentice": return 500 - currentPoints;
+      case "tradie": return 1000 - currentPoints;
+      default: return 0;
+    }
+  };
+
+  const recentTransactions = transactions?.slice(0, 3) || [];
+
+  return (
+    <div className="min-h-screen bg-slate-800">
+      {/* Header */}
+      <header className="bg-slate-800 border-b-4 border-orange-500 sticky top-0 z-50">
+        <div className="flex items-center justify-between px-4 py-3">
+          <div className="flex items-center space-x-3">
+            <div className="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center">
+              <HardHat className="text-slate-800 w-6 h-6" />
+            </div>
+            <div>
+              <h1 className="text-white font-bold text-lg">HI-VIS</h1>
+              <p className="text-yellow-400 text-xs font-medium">VENDING</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-3">
+            <button className="text-white relative">
+              <Bell className="w-5 h-5" />
+              <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+            </button>
+            <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
+              <span className="text-slate-800 font-bold text-sm">
+                {user.firstName?.[0] || 'U'}{user.lastName?.[0] || ''}
+              </span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main className="pb-20">
+        {/* Hero Section */}
+        <section className="gradient-orange p-6 text-slate-800">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-2xl font-bold">
+                {user.firstName ? `${user.firstName} ${user.lastName || ''}` : 'Welcome'}
+              </h2>
+              <p className="text-lg opacity-90">Welcome back, {getTierName(user.loyaltyTier || 'apprentice')}!</p>
+            </div>
+            <div className="text-right">
+              <p className="text-3xl font-bold">{user.totalPoints || 0}</p>
+              <p className="text-sm opacity-90">Points</p>
+            </div>
+          </div>
+          
+          <LoyaltyProgress 
+            tier={user.loyaltyTier || 'apprentice'}
+            points={user.totalPoints || 0}
+          />
+        </section>
+
+        {/* Quick Actions */}
+        <section className="px-6 py-6">
+          <h3 className="text-white text-lg font-semibold mb-4">Quick Actions</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <Link href="/scan">
+              <Button className="w-full bg-slate-700 hover:bg-slate-600 rounded-xl p-6 h-auto flex-col space-y-3 border border-slate-600">
+                <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
+                  <QrCode className="text-white w-6 h-6" />
+                </div>
+                <div className="text-center">
+                  <p className="font-semibold text-white">Scan QR</p>
+                  <p className="text-xs text-slate-400 mt-1">Earn points</p>
+                </div>
+              </Button>
+            </Link>
+            
+            <Link href="/rewards">
+              <Button className="w-full bg-slate-700 hover:bg-slate-600 rounded-xl p-6 h-auto flex-col space-y-3 border border-slate-600">
+                <div className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center">
+                  <Gift className="text-slate-800 w-6 h-6" />
+                </div>
+                <div className="text-center">
+                  <p className="font-semibold text-white">Rewards</p>
+                  <p className="text-xs text-slate-400 mt-1">Redeem now</p>
+                </div>
+              </Button>
+            </Link>
+          </div>
+        </section>
+
+        {/* Punch Card */}
+        <section className="px-6 py-4">
+          <PunchCard progress={user.punchCardProgress || 0} />
+        </section>
+
+        {/* Recent Activity */}
+        {recentTransactions.length > 0 && (
+          <section className="px-6 py-4">
+            <h3 className="text-white text-lg font-semibold mb-4">Recent Activity</h3>
+            <Card className="bg-slate-700 border-slate-600">
+              <CardContent className="p-0">
+                {recentTransactions.map((transaction, index) => (
+                  <div key={transaction.id} className={`p-4 flex items-center justify-between ${
+                    index < recentTransactions.length - 1 ? 'border-b border-slate-600' : ''
+                  }`}>
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                        transaction.type === 'purchase' ? 'bg-green-100' :
+                        transaction.type === 'redemption' ? 'bg-red-100' : 'bg-yellow-100'
+                      }`}>
+                        <span className={`text-sm font-bold ${
+                          transaction.type === 'purchase' ? 'text-green-600' :
+                          transaction.type === 'redemption' ? 'text-red-600' : 'text-yellow-600'
+                        }`}>
+                          {transaction.type === 'purchase' ? '+' : 
+                           transaction.type === 'redemption' ? '−' : '★'}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-white capitalize">{transaction.type}</p>
+                        <p className="text-sm text-slate-400">
+                          {new Date(transaction.createdAt!).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className={`font-semibold ${
+                        transaction.points > 0 ? 'text-green-400' : 'text-red-400'
+                      }`}>
+                        {transaction.points > 0 ? '+' : ''}{transaction.points} pts
+                      </p>
+                      <p className="text-sm text-slate-400">{transaction.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </section>
+        )}
+      </main>
+
+      <Navigation />
+    </div>
+  );
+}
