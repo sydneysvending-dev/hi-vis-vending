@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { HardHat, Users, Activity, Gift, Bell, Link2, DollarSign, Target, Clock, ArrowLeft, Send } from "lucide-react";
+import { HardHat, Users, Activity, Gift, Bell, Link2, DollarSign, Target, Clock, ArrowLeft, Send, Play, Square, Wifi, WifiOff } from "lucide-react";
 import { Link } from "wouter";
 
 export default function Admin() {
@@ -23,6 +23,13 @@ export default function Admin() {
     title: "",
     message: "",
     type: "promotion"
+  });
+
+  // Moma sync state
+  const [syncStatus, setSyncStatus] = useState({
+    isRunning: false,
+    lastSync: null,
+    connectionStatus: "unknown"
   });
 
   // Query admin stats
@@ -84,6 +91,72 @@ export default function Admin() {
       toast({
         title: "Matching Failed",
         description: error.message || "Could not match transaction",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Moma sync mutations
+  const startSyncMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/admin/start-moma-sync", {});
+      return response.json();
+    },
+    onSuccess: () => {
+      setSyncStatus(prev => ({ ...prev, isRunning: true }));
+      toast({
+        title: "Moma Sync Started",
+        description: "Now automatically checking for new transactions every 30 seconds",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Sync Failed",
+        description: error.message || "Could not start Moma sync",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const stopSyncMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/admin/stop-moma-sync", {});
+      return response.json();
+    },
+    onSuccess: () => {
+      setSyncStatus(prev => ({ ...prev, isRunning: false }));
+      toast({
+        title: "Moma Sync Stopped",
+        description: "Automatic transaction checking has been disabled",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Stop Failed",
+        description: error.message || "Could not stop Moma sync",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const testConnectionMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/admin/test-moma-connection", {});
+      return response.json();
+    },
+    onSuccess: (data) => {
+      setSyncStatus(prev => ({ ...prev, connectionStatus: data.success ? "connected" : "failed" }));
+      toast({
+        title: data.success ? "Connection Success" : "Connection Failed",
+        description: data.message,
+        variant: data.success ? "default" : "destructive",
+      });
+    },
+    onError: (error) => {
+      setSyncStatus(prev => ({ ...prev, connectionStatus: "failed" }));
+      toast({
+        title: "Connection Test Failed",
+        description: error.message || "Could not test Moma connection",
         variant: "destructive",
       });
     },
@@ -234,7 +307,7 @@ export default function Admin() {
 
         {/* Admin Tabs */}
         <Tabs defaultValue="notifications" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-slate-700">
+          <TabsList className="grid w-full grid-cols-4 bg-slate-700">
             <TabsTrigger value="notifications" className="data-[state=active]:bg-orange-500 data-[state=active]:text-slate-800">
               <Bell className="w-4 h-4 mr-2" />
               Notifications
@@ -246,6 +319,10 @@ export default function Admin() {
             <TabsTrigger value="transactions" className="data-[state=active]:bg-orange-500 data-[state=active]:text-slate-800">
               <Clock className="w-4 h-4 mr-2" />
               Transactions
+            </TabsTrigger>
+            <TabsTrigger value="moma" className="data-[state=active]:bg-orange-500 data-[state=active]:text-slate-800">
+              <Link2 className="w-4 h-4 mr-2" />
+              Moma Sync
             </TabsTrigger>
           </TabsList>
 
@@ -416,6 +493,119 @@ export default function Admin() {
                     ))}
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Moma Integration Tab */}
+          <TabsContent value="moma" className="space-y-6">
+            <Card className="bg-slate-700 border-slate-600">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center">
+                  <Link2 className="w-5 h-5 mr-2 text-orange-500" />
+                  Moma App Integration
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-slate-800 rounded-lg">
+                  <div>
+                    <h4 className="text-white font-semibold">Auto-Sync Status</h4>
+                    <p className="text-slate-400 text-sm">
+                      {syncStatus.isRunning 
+                        ? "Checking for new transactions every 30 seconds" 
+                        : "Automatic sync is stopped"}
+                    </p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    {syncStatus.isRunning ? (
+                      <Wifi className="w-6 h-6 text-green-400" />
+                    ) : (
+                      <WifiOff className="w-6 h-6 text-slate-400" />
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Button
+                    onClick={() => startSyncMutation.mutate()}
+                    disabled={startSyncMutation.isPending || syncStatus.isRunning}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    {startSyncMutation.isPending ? "Starting..." : "Start Auto-Sync"}
+                  </Button>
+
+                  <Button
+                    onClick={() => stopSyncMutation.mutate()}
+                    disabled={stopSyncMutation.isPending || !syncStatus.isRunning}
+                    className="bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    <Square className="w-4 h-4 mr-2" />
+                    {stopSyncMutation.isPending ? "Stopping..." : "Stop Auto-Sync"}
+                  </Button>
+
+                  <Button
+                    onClick={() => testConnectionMutation.mutate()}
+                    disabled={testConnectionMutation.isPending}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <Wifi className="w-4 h-4 mr-2" />
+                    {testConnectionMutation.isPending ? "Testing..." : "Test Connection"}
+                  </Button>
+                </div>
+
+                <div className="p-4 bg-slate-800 rounded-lg">
+                  <h4 className="text-white font-semibold mb-2">Connection Status</h4>
+                  <div className="flex items-center space-x-2">
+                    <div className={`w-3 h-3 rounded-full ${
+                      syncStatus.connectionStatus === "connected" ? "bg-green-400" :
+                      syncStatus.connectionStatus === "failed" ? "bg-red-400" : "bg-yellow-400"
+                    }`} />
+                    <span className="text-slate-300">
+                      {syncStatus.connectionStatus === "connected" ? "Connected to Moma API" :
+                       syncStatus.connectionStatus === "failed" ? "Connection Failed" : "Connection Unknown"}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Integration Setup Instructions */}
+            <Card className="bg-slate-700 border-slate-600">
+              <CardHeader>
+                <CardTitle className="text-white">Integration Setup Guide</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-4 text-slate-300">
+                  <div>
+                    <h4 className="text-white font-semibold mb-2">Method 1: Real-time Webhooks (Recommended)</h4>
+                    <p className="text-sm mb-2">Configure your Moma app to send transaction data instantly:</p>
+                    <div className="bg-slate-800 p-3 rounded font-mono text-xs">
+                      POST https://your-domain/api/moma/webhook
+                    </div>
+                    <p className="text-xs mt-2">Include card number, amount, product, and timestamp in the webhook payload.</p>
+                  </div>
+
+                  <div>
+                    <h4 className="text-white font-semibold mb-2">Method 2: API Polling (Auto-sync)</h4>
+                    <p className="text-sm mb-2">Set up environment variables and use the auto-sync feature:</p>
+                    <div className="space-y-1 text-xs">
+                      <div>• MOMA_API_KEY - Your Moma API authentication key</div>
+                      <div>• MOMA_API_URL - Your Moma API endpoint URL</div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-white font-semibold mb-2">Method 3: Manual CSV Import</h4>
+                    <p className="text-sm">Export transaction data from Moma and use the manual matching system.</p>
+                  </div>
+
+                  <div className="bg-orange-100 border border-orange-400 p-3 rounded">
+                    <p className="text-orange-800 text-sm font-semibold">
+                      💡 Pro Tip: For best results, have customers link their payment card numbers in their Hi-Vis profiles for automatic matching.
+                    </p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

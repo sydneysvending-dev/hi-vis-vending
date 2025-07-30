@@ -389,6 +389,101 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Moma Integration Routes
+  
+  // Webhook endpoint for Moma to send real-time transaction data
+  app.post('/api/moma/webhook', async (req, res) => {
+    try {
+      const { momaIntegration } = await import('./momaIntegration');
+      await momaIntegration.processWebhookData(req.body);
+      res.json({ success: true, message: "Webhook processed successfully" });
+    } catch (error) {
+      console.error("Error processing Moma webhook:", error);
+      res.status(500).json({ message: "Failed to process webhook" });
+    }
+  });
+
+  // Start automatic polling of Moma API
+  app.post('/api/admin/start-moma-sync', isAuthenticated, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user.claims.sub);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { momaIntegration } = await import('./momaIntegration');
+      momaIntegration.startPolling();
+      res.json({ success: true, message: "Moma sync started" });
+    } catch (error) {
+      console.error("Error starting Moma sync:", error);
+      res.status(500).json({ message: "Failed to start Moma sync" });
+    }
+  });
+
+  // Stop automatic polling
+  app.post('/api/admin/stop-moma-sync', isAuthenticated, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user.claims.sub);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { momaIntegration } = await import('./momaIntegration');
+      momaIntegration.stopPolling();
+      res.json({ success: true, message: "Moma sync stopped" });
+    } catch (error) {
+      console.error("Error stopping Moma sync:", error);
+      res.status(500).json({ message: "Failed to stop Moma sync" });
+    }
+  });
+
+  // Test Moma connection
+  app.post('/api/admin/test-moma-connection', isAuthenticated, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user.claims.sub);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      // Test connection to Moma API
+      const momaApiUrl = process.env.MOMA_API_URL || "https://api.moma.app";
+      const momaApiKey = process.env.MOMA_API_KEY;
+
+      if (!momaApiKey) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "MOMA_API_KEY not configured" 
+        });
+      }
+
+      const testResponse = await fetch(`${momaApiUrl}/api/health`, {
+        headers: {
+          'Authorization': `Bearer ${momaApiKey}`,
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (testResponse.ok) {
+        res.json({ 
+          success: true, 
+          message: "Moma API connection successful",
+          apiUrl: momaApiUrl 
+        });
+      } else {
+        res.json({ 
+          success: false, 
+          message: `Moma API returned ${testResponse.status}: ${testResponse.statusText}` 
+        });
+      }
+    } catch (error) {
+      console.error("Error testing Moma connection:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to connect to Moma API" 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
