@@ -70,6 +70,12 @@ export class MomaIntegrationService {
   // Method 3: Direct API Fetch - Get transactions from Moma API
   private async fetchAndProcessNewTransactions(): Promise<void> {
     try {
+      // Check if API credentials are configured
+      if (!this.apiKey || !this.baseUrl || this.baseUrl === "https://api.moma.app") {
+        console.log("⏸️ Moma API not configured - skipping polling");
+        return;
+      }
+
       // Get the timestamp of the last processed transaction
       const lastProcessedTime = await this.getLastProcessedTimestamp();
       
@@ -108,7 +114,9 @@ export class MomaIntegrationService {
 
     } catch (error) {
       console.error("❌ Error fetching from Moma API:", error);
-      throw error;
+      // Don't throw error to prevent stopping the polling loop
+      console.log("⏸️ Stopping polling due to API error");
+      this.stopPolling();
     }
   }
 
