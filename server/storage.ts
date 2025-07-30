@@ -17,6 +17,10 @@ export interface IStorage {
   // User operations (mandatory for Replit Auth)
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
+  getUserByReferralCode(referralCode: string): Promise<User | undefined>;
+  generateReferralCode(userId: string): Promise<string>;
+  updateUserReferredBy(userId: string, referrerId: string): Promise<User>;
+  updateReferralCount(userId: string, count: number): Promise<User>;
   
   // Loyalty operations
   updateUserPoints(userId: string, points: number): Promise<User>;
@@ -54,9 +58,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
+    // Generate referral code if new user
+    const existingUser = await this.getUser(userData.id!);
+    const dataToInsert = {
+      ...userData,
+      referralCode: existingUser?.referralCode || this.generateShortCode(),
+    };
+
     const [user] = await db
       .insert(users)
-      .values(userData)
+      .values(dataToInsert)
       .onConflictDoUpdate({
         target: users.id,
         set: {
@@ -66,6 +77,56 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return user;
+  }
+
+  async getUserByReferralCode(referralCode: string): Promise<User | undefined> {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.referralCode, referralCode));
+    return user;
+  }
+
+  async generateReferralCode(userId: string): Promise<string> {
+    const code = this.generateShortCode();
+    await db
+      .update(users)
+      .set({ referralCode: code })
+      .where(eq(users.id, userId));
+    return code;
+  }
+
+  async updateUserReferredBy(userId: string, referrerId: string): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ 
+        referredBy: referrerId,
+        updatedAt: new Date()
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  async updateReferralCount(userId: string, count: number): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ 
+        referralCount: count,
+        updatedAt: new Date()
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  private generateShortCode(): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for (let i = 0; i < 6; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
   }
 
   // Loyalty operations
@@ -146,7 +207,7 @@ export class DatabaseStorage implements IStorage {
     }
 
     const user = await this.getUser(userId);
-    if (!user || user.totalPoints < reward.pointsCost) {
+    if (!user || (user.totalPoints || 0) < reward.pointsCost) {
       throw new Error("Insufficient points");
     }
 
@@ -159,7 +220,7 @@ export class DatabaseStorage implements IStorage {
     });
 
     // Update user points
-    await this.updateUserPoints(userId, user.totalPoints - reward.pointsCost);
+    await this.updateUserPoints(userId, (user.totalPoints || 0) - reward.pointsCost);
 
     return transaction;
   }

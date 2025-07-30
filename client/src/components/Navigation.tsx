@@ -1,5 +1,5 @@
 import { useLocation } from "wouter";
-import { Home, QrCode, Gift, User } from "lucide-react";
+import { Home, QrCode, Gift, User, Users } from "lucide-react";
 import { Link } from "wouter";
 
 export default function Navigation() {
@@ -11,8 +11,8 @@ export default function Navigation() {
     <nav className="fixed bottom-0 left-0 right-0 bg-slate-800 border-t-2 border-orange-500">
       <div className="flex">
         <Link href="/" className="flex-1">
-          <button className="w-full py-4 px-3 text-center">
-            <Home className={`w-5 h-5 mx-auto mb-1 ${
+          <button className="w-full py-3 px-2 text-center">
+            <Home className={`w-4 h-4 mx-auto mb-1 ${
               isActive('/') ? 'text-orange-500' : 'text-slate-400'
             }`} />
             <span className={`text-xs font-medium ${
@@ -24,8 +24,8 @@ export default function Navigation() {
         </Link>
         
         <Link href="/scan" className="flex-1">
-          <button className="w-full py-4 px-3 text-center">
-            <QrCode className={`w-5 h-5 mx-auto mb-1 ${
+          <button className="w-full py-3 px-2 text-center">
+            <QrCode className={`w-4 h-4 mx-auto mb-1 ${
               isActive('/scan') ? 'text-orange-500' : 'text-slate-400'
             }`} />
             <span className={`text-xs font-medium ${
@@ -36,9 +36,22 @@ export default function Navigation() {
           </button>
         </Link>
         
+        <Link href="/referral" className="flex-1">
+          <button className="w-full py-3 px-2 text-center">
+            <Users className={`w-4 h-4 mx-auto mb-1 ${
+              isActive('/referral') ? 'text-orange-500' : 'text-slate-400'
+            }`} />
+            <span className={`text-xs font-medium ${
+              isActive('/referral') ? 'text-orange-500' : 'text-slate-400'
+            }`}>
+              Refer
+            </span>
+          </button>
+        </Link>
+        
         <Link href="/rewards" className="flex-1">
-          <button className="w-full py-4 px-3 text-center">
-            <Gift className={`w-5 h-5 mx-auto mb-1 ${
+          <button className="w-full py-3 px-2 text-center">
+            <Gift className={`w-4 h-4 mx-auto mb-1 ${
               isActive('/rewards') ? 'text-orange-500' : 'text-slate-400'
             }`} />
             <span className={`text-xs font-medium ${
@@ -50,8 +63,8 @@ export default function Navigation() {
         </Link>
         
         <Link href="/profile" className="flex-1">
-          <button className="w-full py-4 px-3 text-center">
-            <User className={`w-5 h-5 mx-auto mb-1 ${
+          <button className="w-full py-3 px-2 text-center">
+            <User className={`w-4 h-4 mx-auto mb-1 ${
               isActive('/profile') ? 'text-orange-500' : 'text-slate-400'
             }`} />
             <span className={`text-xs font-medium ${

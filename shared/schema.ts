@@ -35,6 +35,9 @@ export const users = pgTable("users", {
   totalPoints: integer("total_points").default(0),
   punchCardProgress: integer("punch_card_progress").default(0),
   isAdmin: boolean("is_admin").default(false),
+  referralCode: varchar("referral_code").unique(),
+  referredBy: varchar("referred_by"),
+  referralCount: integer("referral_count").default(0),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

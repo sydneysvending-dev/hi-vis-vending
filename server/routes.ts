@@ -51,7 +51,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update user points and punch card
       const user = await storage.getUser(userId);
       if (user) {
-        const newPoints = user.totalPoints + points;
+        const newPoints = (user.totalPoints || 0) + points;
         const newPunchProgress = Math.min((user.punchCardProgress || 0) + 1, 10);
         
         await storage.updateUserPoints(userId, newPoints);
@@ -157,6 +157,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Referral routes
+  app.get('/api/referral/my-code', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user?.referralCode) {
+        const newCode = await storage.generateReferralCode(userId);
+        res.json({ referralCode: newCode });
+      } else {
+        res.json({ referralCode: user.referralCode });
+      }
+    } catch (error) {
+      console.error("Error getting referral code:", error);
+      res.status(500).json({ message: "Failed to get referral code" });
+    }
+  });
+
+  app.post('/api/referral/use-code', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { referralCode } = req.body;
+      
+      const user = await storage.getUser(userId);
+      if (user?.referredBy) {
+        return res.status(400).json({ message: "You have already used a referral code" });
+      }
+
+      const referrer = await storage.getUserByReferralCode(referralCode);
+      if (!referrer) {
+        return res.status(400).json({ message: "Invalid referral code" });
+      }
+
+      if (referrer.id === userId) {
+        return res.status(400).json({ message: "Cannot use your own referral code" });
+      }
+
+      // Update the new user with referral
+      await storage.updateUserReferredBy(userId, referrer.id);
+      
+      // Give both users bonus points
+      await storage.createTransaction({
+        userId: referrer.id,
+        type: "bonus",
+        points: 50,
+        description: "Referral bonus - Friend joined",
+      });
+
+      await storage.createTransaction({
+        userId,
+        type: "bonus", 
+        points: 25,
+        description: "Welcome bonus - Used referral code",
+      });
+
+      // Update points
+      await storage.updateUserPoints(referrer.id, (referrer.totalPoints || 0) + 50);
+      await storage.updateUserPoints(userId, (user?.totalPoints || 0) + 25);
+      await storage.updateReferralCount(referrer.id, (referrer.referralCount || 0) + 1);
+
+      res.json({ success: true, pointsEarned: 25 });
+    } catch (error) {
+      console.error("Error using referral code:", error);
+      res.status(500).json({ message: "Failed to use referral code" });
+    }
+  });
+
   // QR code simulation route
   app.post('/api/qr/scan', isAuthenticated, async (req: any, res) => {
     try {
@@ -182,7 +249,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update user points and punch card
       const user = await storage.getUser(userId);
       if (user) {
-        const newPoints = user.totalPoints + 10;
+        const newPoints = (user.totalPoints || 0) + 10;
         const newPunchProgress = Math.min((user.punchCardProgress || 0) + 1, 10);
         
         await storage.updateUserPoints(userId, newPoints);

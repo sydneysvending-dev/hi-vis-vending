@@ -11,6 +11,7 @@ import Scan from "@/pages/scan";
 import Rewards from "@/pages/rewards";
 import Profile from "@/pages/profile";
 import Admin from "@/pages/admin";
+import Referral from "@/pages/referral";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -23,6 +24,7 @@ function Router() {
         <>
           <Route path="/" component={Home} />
           <Route path="/scan" component={Scan} />
+          <Route path="/referral" component={Referral} />
           <Route path="/rewards" component={Rewards} />
           <Route path="/profile" component={Profile} />
           <Route path="/admin" component={Admin} />
