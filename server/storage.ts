@@ -3,12 +3,18 @@ import {
   transactions,
   rewards,
   machines,
+  notifications,
+  externalTransactions,
   type User,
   type UpsertUser,
   type InsertTransaction,
   type Transaction,
   type Reward,
   type Machine,
+  type Notification,
+  type InsertNotification,
+  type ExternalTransaction,
+  type InsertExternalTransaction,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
@@ -46,8 +52,23 @@ export interface IStorage {
     totalTransactions: number;
     pointsRedeemed: number;
     activeMachines: number;
+    activeUsersToday: number;
+    totalPointsEarned: number;
   }>;
   getRecentUsers(limit?: number): Promise<User[]>;
+  getAllUsers(): Promise<User[]>;
+  
+  // Notification operations
+  createNotification(notification: InsertNotification): Promise<Notification>;
+  sendBulkNotifications(title: string, message: string, type: string, userIds?: string[]): Promise<void>;
+  getUserNotifications(userId: string): Promise<Notification[]>;
+  markNotificationRead(notificationId: string): Promise<void>;
+  
+  // External transaction matching
+  processExternalTransaction(transaction: InsertExternalTransaction): Promise<void>;
+  getUnprocessedExternalTransactions(): Promise<ExternalTransaction[]>;
+  matchTransactionToUser(externalTransactionId: string, userId: string): Promise<void>;
+  getUserByCardNumber(cardNumber: string): Promise<User | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -248,6 +269,8 @@ export class DatabaseStorage implements IStorage {
     totalTransactions: number;
     pointsRedeemed: number;
     activeMachines: number;
+    activeUsersToday: number;
+    totalPointsEarned: number;
   }> {
     const totalUsers = await db.select().from(users);
     const allTransactions = await db.select().from(transactions);
@@ -257,11 +280,25 @@ export class DatabaseStorage implements IStorage {
       .filter(t => t.type === "redemption")
       .reduce((sum, t) => sum + Math.abs(t.points), 0);
 
+    const totalPointsEarned = allTransactions
+      .filter(t => t.points > 0)
+      .reduce((sum, t) => sum + t.points, 0);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const activeUsersToday = allTransactions
+      .filter(t => new Date(t.createdAt!) >= today)
+      .map(t => t.userId)
+      .filter((userId, index, arr) => arr.indexOf(userId) === index)
+      .length;
+
     return {
       totalUsers: totalUsers.length,
       totalTransactions: allTransactions.length,
       pointsRedeemed,
       activeMachines: activeMachines.length,
+      activeUsersToday,
+      totalPointsEarned,
     };
   }
 
@@ -271,6 +308,150 @@ export class DatabaseStorage implements IStorage {
       .from(users)
       .orderBy(desc(users.createdAt))
       .limit(limit);
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return await db.select().from(users);
+  }
+
+  // Notification operations
+  async createNotification(notification: InsertNotification): Promise<Notification> {
+    const [newNotification] = await db
+      .insert(notifications)
+      .values(notification)
+      .returning();
+    return newNotification;
+  }
+
+  async sendBulkNotifications(title: string, message: string, type: string, userIds?: string[]): Promise<void> {
+    let targetUsers: User[];
+    
+    if (userIds && userIds.length > 0) {
+      targetUsers = await db.select().from(users).where(and(...userIds.map(id => eq(users.id, id))));
+    } else {
+      targetUsers = await db.select().from(users).where(eq(users.notificationsEnabled, true));
+    }
+
+    const notificationsToInsert = targetUsers.map(user => ({
+      userId: user.id,
+      title,
+      message,
+      type,
+    }));
+
+    if (notificationsToInsert.length > 0) {
+      await db.insert(notifications).values(notificationsToInsert);
+    }
+  }
+
+  async getUserNotifications(userId: string): Promise<Notification[]> {
+    return await db
+      .select()
+      .from(notifications)
+      .where(eq(notifications.userId, userId))
+      .orderBy(desc(notifications.createdAt))
+      .limit(50);
+  }
+
+  async markNotificationRead(notificationId: string): Promise<void> {
+    await db
+      .update(notifications)
+      .set({ isRead: true })
+      .where(eq(notifications.id, notificationId));
+  }
+
+  // External transaction matching
+  async processExternalTransaction(transaction: InsertExternalTransaction): Promise<void> {
+    // First, store the external transaction
+    const [externalTx] = await db
+      .insert(externalTransactions)
+      .values({
+        ...transaction,
+        isProcessed: false,
+      })
+      .returning();
+
+    // Try to match to a user by card number
+    if (transaction.cardNumber) {
+      const user = await this.getUserByCardNumber(transaction.cardNumber);
+      if (user) {
+        await this.matchTransactionToUser(externalTx.id, user.id);
+      }
+    }
+  }
+
+  async getUnprocessedExternalTransactions(): Promise<ExternalTransaction[]> {
+    return await db
+      .select()
+      .from(externalTransactions)
+      .where(eq(externalTransactions.isProcessed, false))
+      .orderBy(desc(externalTransactions.createdAt));
+  }
+
+  async matchTransactionToUser(externalTransactionId: string, userId: string): Promise<void> {
+    const [externalTx] = await db
+      .select()
+      .from(externalTransactions)
+      .where(eq(externalTransactions.id, externalTransactionId));
+
+    if (!externalTx) return;
+
+    // Calculate points (e.g., 10 points per dollar spent)
+    const points = Math.floor(externalTx.amount / 100) * 10;
+
+    // Create loyalty transaction
+    await this.createTransaction({
+      userId,
+      type: "purchase",
+      points,
+      description: `Purchase: ${externalTx.productName || 'Vending machine item'}`,
+      machineId: externalTx.machineId,
+      externalTransactionId: externalTx.id,
+      amount: externalTx.amount,
+      cardNumber: externalTx.cardNumber || undefined,
+      isAutoGenerated: true,
+    });
+
+    // Update user points
+    const user = await this.getUser(userId);
+    if (user) {
+      const newTotal = (user.totalPoints || 0) + points;
+      await this.updateUserPoints(userId, newTotal);
+
+      // Check for tier promotion
+      let newTier = user.loyaltyTier;
+      if (newTotal >= 1000) newTier = "foreman";
+      else if (newTotal >= 500) newTier = "tradie";
+      
+      if (newTier !== user.loyaltyTier) {
+        await this.updateUserTier(userId, newTier);
+        
+        // Send congratulatory notification
+        await this.createNotification({
+          userId,
+          title: "Level Up!",
+          message: `Congratulations! You've been promoted to ${newTier.charAt(0).toUpperCase() + newTier.slice(1)}!`,
+          type: "achievement",
+        });
+      }
+    }
+
+    // Mark external transaction as processed
+    await db
+      .update(externalTransactions)
+      .set({ 
+        isProcessed: true,
+        matchedUserId: userId,
+      })
+      .where(eq(externalTransactions.id, externalTransactionId));
+  }
+
+  async getUserByCardNumber(cardNumber: string): Promise<User | undefined> {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.cardNumber, cardNumber));
+    return user;
   }
 }
 

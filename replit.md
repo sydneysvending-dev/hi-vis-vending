@@ -102,3 +102,30 @@ The application uses four main database tables:
 - **ISSUER_URL**: OAuth provider URL (defaults to Replit)
 
 The application is optimized for deployment on Replit but can be adapted for other platforms by modifying the authentication strategy and environment configuration.
+
+## Recent Updates (January 2025)
+
+### Push Notifications & Admin Dashboard
+- **Enhanced Admin Dashboard**: Added comprehensive admin control panel with stats overview, user management, and notification sending capabilities
+- **Push Notification System**: Implemented construction industry-themed notification templates ("Knock-off Deal's On", "Smoko Sorted", etc.) with scheduled delivery
+- **User Analytics**: Added real-time statistics including active users today, total points earned/redeemed, and transaction tracking
+
+### Automatic Point Updates (Moma Integration)
+- **External Transaction Processing**: Built API endpoint `/api/external/transaction` to receive vending machine transaction data from Moma app
+- **Automatic User Matching**: System matches transactions to users via card numbers (no QR scanning required)
+- **Real-time Point Awards**: Points automatically credited based on purchase amount (10 points per dollar spent)
+- **Admin Transaction Management**: Unprocessed transactions can be manually matched to users through admin dashboard
+
+### Enhanced Database Schema
+- **Notifications Table**: Stores push notifications with scheduling and read status
+- **External Transactions Table**: Tracks vending machine purchases from external systems
+- **User Enhancements**: Added card number linking, push token storage, and notification preferences
+- **Transaction Enhancements**: Added external transaction ID linking and auto-generation flags
+
+### Integration Capabilities
+- **Webhook Endpoint**: `/api/external/transaction` accepts JSON transaction data from vending machine systems
+- **Automatic Processing**: Transactions automatically trigger point awards, tier promotions, and achievement notifications
+- **Manual Override**: Admin can manually match unprocessed transactions to users
+- **Real-time Updates**: Dashboard refreshes every 30 seconds to show new transactions
+
+The system now supports fully automated point updates without user interaction, making it seamless for customers to earn loyalty points from vending machine purchases.

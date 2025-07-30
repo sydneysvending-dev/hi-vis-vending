@@ -149,7 +149,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Admin access required" });
       }
 
-      const users = await storage.getRecentUsers();
+      const users = await storage.getAllUsers();
       res.json(users);
     } catch (error) {
       console.error("Error fetching admin users:", error);
@@ -276,6 +276,116 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error processing QR scan:", error);
       res.status(500).json({ message: "Failed to process QR scan" });
+    }
+  });
+
+  // Notification routes
+  app.post('/api/admin/send-notification', isAuthenticated, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user.claims.sub);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { title, message, type, userIds } = req.body;
+      await storage.sendBulkNotifications(title, message, type, userIds);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error sending notifications:", error);
+      res.status(500).json({ message: "Failed to send notifications" });
+    }
+  });
+
+  app.get('/api/notifications', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const notifications = await storage.getUserNotifications(userId);
+      res.json(notifications);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      res.status(500).json({ message: "Failed to fetch notifications" });
+    }
+  });
+
+  app.post('/api/notifications/:id/read', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      await storage.markNotificationRead(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error marking notification read:", error);
+      res.status(500).json({ message: "Failed to mark notification read" });
+    }
+  });
+
+  // External transaction processing routes
+  app.post('/api/external/transaction', async (req, res) => {
+    try {
+      const { externalId, machineId, cardNumber, amount, productName, timestamp } = req.body;
+      
+      await storage.processExternalTransaction({
+        externalId,
+        machineId,
+        cardNumber,
+        amount,
+        productName,
+        timestamp: new Date(timestamp),
+      });
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error processing external transaction:", error);
+      res.status(500).json({ message: "Failed to process transaction" });
+    }
+  });
+
+  app.get('/api/admin/unprocessed-transactions', isAuthenticated, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user.claims.sub);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const transactions = await storage.getUnprocessedExternalTransactions();
+      res.json(transactions);
+    } catch (error) {
+      console.error("Error fetching unprocessed transactions:", error);
+      res.status(500).json({ message: "Failed to fetch unprocessed transactions" });
+    }
+  });
+
+  app.post('/api/admin/match-transaction', isAuthenticated, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user.claims.sub);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { externalTransactionId, userId } = req.body;
+      await storage.matchTransactionToUser(externalTransactionId, userId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error matching transaction:", error);
+      res.status(500).json({ message: "Failed to match transaction" });
+    }
+  });
+
+  // Update user profile with card number for automatic matching
+  app.post('/api/user/update-card', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { cardNumber } = req.body;
+      
+      await storage.upsertUser({ 
+        id: userId, 
+        cardNumber,
+        updatedAt: new Date(),
+      });
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error updating card number:", error);
+      res.status(500).json({ message: "Failed to update card number" });
     }
   });
 
