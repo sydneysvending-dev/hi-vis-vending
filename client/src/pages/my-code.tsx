@@ -198,7 +198,38 @@ export default function MyCode() {
           </CardContent>
         </Card>
 
-
+        {/* How to Use */}
+        <Card className="border-orange-200">
+          <CardHeader>
+            <CardTitle className="text-lg text-orange-700">
+              📱 How to Use Your QR Code
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ol className="space-y-3 text-sm text-gray-700">
+              <li className="flex gap-3">
+                <span className="flex-shrink-0 w-6 h-6 bg-orange-100 text-orange-700 rounded-full flex items-center justify-center text-xs font-semibold">1</span>
+                <span>Approach any Hi-Vis vending machine</span>
+              </li>
+              <li className="flex gap-3">
+                <span className="flex-shrink-0 w-6 h-6 bg-orange-100 text-orange-700 rounded-full flex items-center justify-center text-xs font-semibold">2</span>
+                <span>Select "Scan QR Code" on the machine screen</span>
+              </li>
+              <li className="flex gap-3">
+                <span className="flex-shrink-0 w-6 h-6 bg-orange-100 text-orange-700 rounded-full flex items-center justify-center text-xs font-semibold">3</span>
+                <span>Hold your phone with this QR code up to the scanner</span>
+              </li>
+              <li className="flex gap-3">
+                <span className="flex-shrink-0 w-6 h-6 bg-orange-100 text-orange-700 rounded-full flex items-center justify-center text-xs font-semibold">4</span>
+                <span>Your promotions will be applied automatically!</span>
+              </li>
+              <li className="flex gap-3">
+                <span className="flex-shrink-0 w-6 h-6 bg-orange-100 text-orange-700 rounded-full flex items-center justify-center text-xs font-semibold">5</span>
+                <span>Complete your purchase and earn bonus points</span>
+              </li>
+            </ol>
+          </CardContent>
+        </Card>
 
 
 
