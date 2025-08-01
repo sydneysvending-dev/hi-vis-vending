@@ -141,6 +141,21 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
+  // Reward redemption methods
+  async getTransactionByRedemptionCode(code: string): Promise<Transaction | undefined> {
+    const [transaction] = await db.select().from(transactions).where(eq(transactions.redemptionCode, code));
+    return transaction;
+  }
+
+  async markTransactionAsRedeemed(transactionId: string): Promise<void> {
+    await db.update(transactions)
+      .set({ 
+        isRedeemed: true, 
+        redeemedAt: new Date() 
+      })
+      .where(eq(transactions.id, transactionId));
+  }
+
   private generateShortCode(): string {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let result = '';

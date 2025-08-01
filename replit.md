@@ -129,3 +129,15 @@ The application is optimized for deployment on Replit but can be adapted for oth
 - **Real-time Updates**: Dashboard refreshes every 30 seconds to show new transactions
 
 The system now supports fully automated point updates without user interaction, making it seamless for customers to earn loyalty points from vending machine purchases.
+
+### Alternative Integration Methods (No API Required)
+- **CSV Import System**: Admins can export transaction data from Moma app and upload CSV files for automatic processing
+- **QR Code Manual Entry**: Customers can scan QR codes at vending machines to manually add points for purchases
+- **Redemption Code System**: Customers receive unique codes (e.g., HIVIS-ABC123-DEF4) when redeeming rewards that can be validated at vending machines
+- **Admin Validation Tools**: Built-in redemption code validator for vending machine operators to verify and mark codes as used
+
+### Enhanced Reward Redemption System
+- **Unique Redemption Codes**: Each reward redemption generates a unique alphanumeric code
+- **Modal Display**: Customers see redemption codes in a prominent modal with copy-to-clipboard functionality
+- **Code Validation**: Admin dashboard includes tools to validate redemption codes and mark them as used
+- **Customer Notifications**: Automatic notifications sent when rewards are redeemed with redemption instructions

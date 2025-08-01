@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { HardHat, Users, Activity, Gift, Bell, Link2, DollarSign, Target, Clock, ArrowLeft, Send, Play, Square, Wifi, WifiOff } from "lucide-react";
+import { HardHat, Users, Activity, Gift, Bell, Link2, DollarSign, Target, Clock, ArrowLeft, Send, Play, Square, Wifi, WifiOff, Upload, CheckCircle } from "lucide-react";
 import { Link } from "wouter";
 
 export default function Admin() {
@@ -31,6 +31,10 @@ export default function Admin() {
     lastSync: null,
     connectionStatus: "unknown"
   });
+
+  // CSV and redemption state
+  const [csvData, setCsvData] = useState("");
+  const [redemptionCode, setRedemptionCode] = useState("");
 
   // Query admin stats
   const { data: stats } = useQuery({
@@ -157,6 +161,59 @@ export default function Admin() {
       toast({
         title: "Connection Test Failed",
         description: error.message || "Could not test Moma connection",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // CSV upload mutation
+  const uploadCsvMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/admin/upload-csv", { csvData });
+      return response.json();
+    },
+    onSuccess: (data) => {
+      setCsvData("");
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/unprocessed-transactions"] });
+      toast({
+        title: "CSV Upload Complete",
+        description: `Processed ${data.processed} transactions, ${data.errors} errors`,
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Upload Failed",
+        description: error.message || "Could not process CSV data",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Redemption code validation mutation
+  const validateCodeMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/admin/validate-redemption", { redemptionCode });
+      return response.json();
+    },
+    onSuccess: (data) => {
+      setRedemptionCode("");
+      if (data.valid) {
+        toast({
+          title: "Valid Redemption Code!",
+          description: `${data.reward} for ${data.customerName}`,
+        });
+      } else {
+        toast({
+          title: "Invalid Code",
+          description: data.message,
+          variant: "destructive",
+        });
+      }
+    },
+    onError: (error) => {
+      toast({
+        title: "Validation Failed",
+        description: error.message || "Could not validate redemption code",
         variant: "destructive",
       });
     },
@@ -525,33 +582,44 @@ export default function Admin() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Button
-                    onClick={() => startSyncMutation.mutate()}
-                    disabled={startSyncMutation.isPending || syncStatus.isRunning}
-                    className="bg-green-600 hover:bg-green-700 text-white"
-                  >
-                    <Play className="w-4 h-4 mr-2" />
-                    {startSyncMutation.isPending ? "Starting..." : "Start Auto-Sync"}
-                  </Button>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-4 p-4 bg-slate-800 rounded-lg">
+                    <h4 className="text-white font-semibold">CSV Upload</h4>
+                    <div className="space-y-2">
+                      <Textarea
+                        placeholder="Paste CSV data here (date,amount,card_number,product)..."
+                        value={csvData}
+                        onChange={(e) => setCsvData(e.target.value)}
+                        className="bg-slate-700 border-slate-600 text-white min-h-[100px]"
+                      />
+                      <Button
+                        onClick={() => uploadCsvMutation.mutate()}
+                        disabled={uploadCsvMutation.isPending || !csvData.trim()}
+                        className="w-full bg-orange-600 hover:bg-orange-700 text-white"
+                      >
+                        {uploadCsvMutation.isPending ? "Processing..." : "Upload CSV Data"}
+                      </Button>
+                    </div>
+                  </div>
 
-                  <Button
-                    onClick={() => stopSyncMutation.mutate()}
-                    disabled={stopSyncMutation.isPending || !syncStatus.isRunning}
-                    className="bg-red-600 hover:bg-red-700 text-white"
-                  >
-                    <Square className="w-4 h-4 mr-2" />
-                    {stopSyncMutation.isPending ? "Stopping..." : "Stop Auto-Sync"}
-                  </Button>
-
-                  <Button
-                    onClick={() => testConnectionMutation.mutate()}
-                    disabled={testConnectionMutation.isPending}
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    <Wifi className="w-4 h-4 mr-2" />
-                    {testConnectionMutation.isPending ? "Testing..." : "Test Connection"}
-                  </Button>
+                  <div className="space-y-4 p-4 bg-slate-800 rounded-lg">
+                    <h4 className="text-white font-semibold">Redemption Code Validator</h4>
+                    <div className="space-y-2">
+                      <Input
+                        placeholder="Enter redemption code..."
+                        value={redemptionCode}
+                        onChange={(e) => setRedemptionCode(e.target.value.toUpperCase())}
+                        className="bg-slate-700 border-slate-600 text-white"
+                      />
+                      <Button
+                        onClick={() => validateCodeMutation.mutate()}
+                        disabled={validateCodeMutation.isPending || !redemptionCode.trim()}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                      >
+                        {validateCodeMutation.isPending ? "Validating..." : "Validate Code"}
+                      </Button>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="p-4 bg-slate-800 rounded-lg">
@@ -587,17 +655,18 @@ export default function Admin() {
                   </div>
 
                   <div>
-                    <h4 className="text-white font-semibold mb-2">Method 2: API Polling (Auto-sync)</h4>
-                    <p className="text-sm mb-2">Set up environment variables and use the auto-sync feature:</p>
+                    <h4 className="text-white font-semibold mb-2">Method 2: CSV Import</h4>
+                    <p className="text-sm mb-2">Export transaction data from your Moma app and upload it here:</p>
                     <div className="space-y-1 text-xs">
-                      <div>• MOMA_API_KEY - Your Moma API authentication key</div>
-                      <div>• MOMA_API_URL - Your Moma API endpoint URL</div>
+                      <div>• Export sales reports from Moma app</div>
+                      <div>• Include: date, amount, card number, product</div>
+                      <div>• Upload CSV file for automatic processing</div>
                     </div>
                   </div>
 
                   <div>
-                    <h4 className="text-white font-semibold mb-2">Method 3: Manual CSV Import</h4>
-                    <p className="text-sm">Export transaction data from Moma and use the manual matching system.</p>
+                    <h4 className="text-white font-semibold mb-2">Method 3: QR Code Tracking</h4>
+                    <p className="text-sm">Have customers scan QR codes on vending machines after purchase to earn points manually.</p>
                   </div>
 
                   <div className="bg-orange-100 border border-orange-400 p-3 rounded">
