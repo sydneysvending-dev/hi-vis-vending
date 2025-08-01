@@ -118,18 +118,9 @@ export default function Login() {
               </Button>
 
               <div className="text-center pt-4 space-y-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    toast({
-                      title: "Password Reset",
-                      description: "Please contact support to reset your password: support@hivisvending.com",
-                    });
-                  }}
-                  className="text-sm text-orange-600 hover:text-orange-700 underline"
-                >
+                <Link href="/forgot-password" className="text-sm text-orange-600 hover:text-orange-700 underline">
                   Forgot your password?
-                </button>
+                </Link>
                 
                 <p className="text-gray-600">
                   Don't have an account?{" "}

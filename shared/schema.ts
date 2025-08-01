@@ -48,6 +48,9 @@ export const users = pgTable("users", {
   phoneNumber: varchar("phone_number"), // Alternative matching method
   // Location information
   suburb: varchar("suburb").notNull(), // Mandatory field for grouping customers by construction sites
+  // Password reset functionality
+  resetToken: varchar("reset_token"),
+  resetTokenExpiry: timestamp("reset_token_expiry"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

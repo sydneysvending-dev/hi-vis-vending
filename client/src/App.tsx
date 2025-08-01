@@ -16,6 +16,8 @@ import Referral from "@/pages/referral";
 import CompleteProfile from "@/pages/complete-profile";
 import Signup from "@/pages/signup";
 import Login from "@/pages/login";
+import ForgotPassword from "@/pages/forgot-password";
+import ResetPassword from "@/pages/reset-password";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -29,6 +31,8 @@ function Router() {
           <Route path="/" component={Signup} />
           <Route path="/signup" component={Signup} />
           <Route path="/login" component={Login} />
+          <Route path="/forgot-password" component={ForgotPassword} />
+          <Route path="/reset-password" component={ResetPassword} />
           <Route component={Signup} />
         </>
       ) : (
