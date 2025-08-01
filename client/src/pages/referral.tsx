@@ -276,7 +276,7 @@ export default function Referral() {
         </section>
 
         {/* How to Use Your QR Code */}
-        <section>
+        <section className="mb-6">
           <Card className="bg-slate-700 border-slate-600">
             <CardContent className="p-6">
               <h3 className="text-orange-400 text-lg font-semibold mb-4">
