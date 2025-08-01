@@ -23,15 +23,15 @@ export default function Navigation() {
           </button>
         </Link>
         
-        <Link href="/scan" className="flex-1">
+        <Link href="/my-code" className="flex-1">
           <button className="w-full py-3 px-2 text-center">
             <QrCode className={`w-4 h-4 mx-auto mb-1 ${
-              isActive('/scan') ? 'text-orange-500' : 'text-slate-400'
+              isActive('/my-code') ? 'text-orange-500' : 'text-slate-400'
             }`} />
             <span className={`text-xs font-medium ${
-              isActive('/scan') ? 'text-orange-500' : 'text-slate-400'
+              isActive('/my-code') ? 'text-orange-500' : 'text-slate-400'
             }`}>
-              Scan
+              My Code
             </span>
           </button>
         </Link>
