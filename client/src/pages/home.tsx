@@ -119,14 +119,14 @@ export default function Home() {
         <section className="px-6 py-6">
           <h3 className="text-white text-lg font-semibold mb-4">Quick Actions</h3>
           <div className="grid grid-cols-2 gap-4">
-            <Link href="/scan">
+            <Link href="/my-code">
               <Button className="w-full bg-slate-700 hover:bg-slate-600 rounded-xl p-6 h-auto flex-col space-y-3 border border-slate-600">
                 <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
                   <QrCode className="text-white w-6 h-6" />
                 </div>
                 <div className="text-center">
-                  <p className="font-semibold text-white">Scan QR</p>
-                  <p className="text-xs text-slate-400 mt-1">Earn points</p>
+                  <p className="font-semibold text-white">My Code</p>
+                  <p className="text-xs text-slate-400 mt-1">Show & earn</p>
                 </div>
               </Button>
             </Link>
