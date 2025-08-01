@@ -24,13 +24,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/auth/complete-profile', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const { suburb } = req.body;
+      const { fullName, suburb } = req.body;
       
-      if (!suburb || !suburb.trim()) {
-        return res.status(400).json({ message: "Suburb is required" });
+      if (!fullName || !fullName.trim() || !suburb || !suburb.trim()) {
+        return res.status(400).json({ message: "Full name and suburb are required" });
       }
 
-      const updatedUser = await storage.updateUserSuburb(userId, suburb.trim());
+      // Parse full name into first and last name
+      const nameParts = fullName.trim().split(' ');
+      const firstName = nameParts[0];
+      const lastName = nameParts.slice(1).join(' ') || '';
+
+      const updatedUser = await storage.updateUserProfile(userId, {
+        firstName,
+        lastName,
+        suburb: suburb.trim()
+      });
       res.json(updatedUser);
     } catch (error) {
       console.error("Error updating user profile:", error);

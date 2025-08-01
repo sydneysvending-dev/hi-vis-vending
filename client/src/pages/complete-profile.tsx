@@ -7,16 +7,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { HardHat, MapPin } from "lucide-react";
+import { HardHat, MapPin, User } from "lucide-react";
 
 export default function CompleteProfile() {
+  const [fullName, setFullName] = useState("");
   const [suburb, setSuburb] = useState("");
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const updateProfileMutation = useMutation({
-    mutationFn: async (data: { suburb: string }) => {
+    mutationFn: async (data: { fullName: string; suburb: string }) => {
       const response = await apiRequest("POST", "/api/auth/complete-profile", data);
       return response.json();
     },
@@ -38,15 +39,18 @@ export default function CompleteProfile() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!suburb.trim()) {
+    if (!fullName.trim() || !suburb.trim()) {
       toast({
-        title: "Required Field",
-        description: "Please enter your suburb to continue",
+        title: "Required Fields",
+        description: "Please fill in all required fields to continue",
         variant: "destructive",
       });
       return;
     }
-    updateProfileMutation.mutate({ suburb: suburb.trim() });
+    updateProfileMutation.mutate({ 
+      fullName: fullName.trim(),
+      suburb: suburb.trim() 
+    });
   };
 
   return (
@@ -66,8 +70,26 @@ export default function CompleteProfile() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
+                <Label htmlFor="fullName" className="text-gray-700 font-medium">
+                  Full Name *
+                </Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input
+                    id="fullName"
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="e.g. John Smith"
+                    className="pl-10 border-orange-200 focus:border-orange-500"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="suburb" className="text-gray-700 font-medium">
-                  Construction Site / Suburb *
+                  Suburb *
                 </Label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -88,7 +110,7 @@ export default function CompleteProfile() {
 
               <Button
                 type="submit"
-                disabled={updateProfileMutation.isPending || !suburb.trim()}
+                disabled={updateProfileMutation.isPending || !fullName.trim() || !suburb.trim()}
                 className="w-full bg-orange-600 hover:bg-orange-700 text-white"
               >
                 {updateProfileMutation.isPending ? "Setting up..." : "Complete Profile"}
