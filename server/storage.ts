@@ -32,6 +32,7 @@ export interface IStorage {
   updateUserPoints(userId: string, points: number): Promise<User>;
   updateUserTier(userId: string, tier: string): Promise<User>;
   updatePunchCard(userId: string, progress: number): Promise<User>;
+  updateUserSuburb(id: string, suburb: string): Promise<User>;
   
   // Transaction operations
   createTransaction(transaction: InsertTransaction): Promise<Transaction>;
@@ -198,6 +199,18 @@ export class DatabaseStorage implements IStorage {
         updatedAt: new Date()
       })
       .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  async updateUserSuburb(id: string, suburb: string): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ 
+        suburb: suburb,
+        updatedAt: new Date()
+      })
+      .where(eq(users.id, id))
       .returning();
     return user;
   }

@@ -146,6 +146,10 @@ export default function Profile() {
                 <span className="text-white">{user.email || 'Not provided'}</span>
               </div>
               <div className="flex justify-between">
+                <span className="text-slate-300">Suburb:</span>
+                <span className="text-white">{user.suburb || 'Not set'}</span>
+              </div>
+              <div className="flex justify-between">
                 <span className="text-slate-300">Member since:</span>
                 <span className="text-white">
                   {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Unknown'}

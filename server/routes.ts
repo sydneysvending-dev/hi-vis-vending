@@ -21,6 +21,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post('/api/auth/complete-profile', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { suburb } = req.body;
+      
+      if (!suburb || !suburb.trim()) {
+        return res.status(400).json({ message: "Suburb is required" });
+      }
+
+      const updatedUser = await storage.updateUserSuburb(userId, suburb.trim());
+      res.json(updatedUser);
+    } catch (error) {
+      console.error("Error updating user profile:", error);
+      res.status(500).json({ message: "Failed to update profile" });
+    }
+  });
+
   // User loyalty routes
   app.get('/api/user/transactions', isAuthenticated, async (req: any, res) => {
     try {

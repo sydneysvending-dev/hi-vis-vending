@@ -44,6 +44,8 @@ export const users = pgTable("users", {
   // External integration
   cardNumber: varchar("card_number").unique(), // For matching vending machine transactions
   phoneNumber: varchar("phone_number"), // Alternative matching method
+  // Location information
+  suburb: varchar("suburb").notNull(), // Mandatory field for grouping customers by construction sites
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

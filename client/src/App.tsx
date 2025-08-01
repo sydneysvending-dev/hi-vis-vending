@@ -13,14 +13,20 @@ import Rewards from "@/pages/rewards";
 import Profile from "@/pages/profile";
 import Admin from "@/pages/admin";
 import Referral from "@/pages/referral";
+import CompleteProfile from "@/pages/complete-profile";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
+
+  // Check if user needs to complete their profile (missing suburb)
+  const needsProfileCompletion = isAuthenticated && user && !user.suburb;
 
   return (
     <Switch>
       {isLoading || !isAuthenticated ? (
         <Route path="/" component={Landing} />
+      ) : needsProfileCompletion ? (
+        <Route path="*" component={CompleteProfile} />
       ) : (
         <>
           <Route path="/" component={Home} />
