@@ -255,7 +255,7 @@ export default function Referral() {
           </section>
         )}
 
-        {/* Referral Stats */}
+        {/* Referral Stats - Moved to Bottom */}
         <section>
           <h3 className="text-white text-lg font-semibold mb-4">Your Referrals</h3>
           <div className="grid grid-cols-2 gap-4">
