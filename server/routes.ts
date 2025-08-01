@@ -50,7 +50,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User loyalty routes
   app.get('/api/user/transactions', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const transactions = await storage.getUserTransactions(userId);
       res.json(transactions);
     } catch (error) {
@@ -61,7 +61,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/user/purchase', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { machineId, amount } = req.body;
       
       // Award 10 points per purchase
@@ -126,7 +126,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/rewards/redeem', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { rewardId } = req.body;
       
       const transaction = await storage.redeemReward(userId, rewardId);
@@ -155,7 +155,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin routes
   app.get('/api/admin/stats', isAuthenticated, async (req: any, res) => {
     try {
-      const user = await storage.getUser(req.user.claims.sub);
+      const user = await storage.getUser(req.user.id);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -170,7 +170,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/admin/users', isAuthenticated, async (req: any, res) => {
     try {
-      const user = await storage.getUser(req.user.claims.sub);
+      const user = await storage.getUser(req.user.id);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -186,7 +186,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Referral routes
   app.get('/api/referral/my-code', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const user = await storage.getUser(userId);
       
       if (!user?.referralCode) {
@@ -203,7 +203,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/referral/use-code', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { referralCode } = req.body;
       
       const user = await storage.getUser(userId);
@@ -253,7 +253,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // QR code simulation route
   app.post('/api/qr/scan', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { qrData } = req.body;
       
       // Parse QR data (format: "HIVIS_MACHINE_001")
@@ -308,7 +308,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Notification routes
   app.post('/api/admin/send-notification', isAuthenticated, async (req: any, res) => {
     try {
-      const user = await storage.getUser(req.user.claims.sub);
+      const user = await storage.getUser(req.user.id);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -324,7 +324,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/notifications', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const notifications = await storage.getUserNotifications(userId);
       res.json(notifications);
     } catch (error) {
@@ -367,7 +367,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/admin/unprocessed-transactions', isAuthenticated, async (req: any, res) => {
     try {
-      const user = await storage.getUser(req.user.claims.sub);
+      const user = await storage.getUser(req.user.id);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -382,7 +382,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/admin/match-transaction', isAuthenticated, async (req: any, res) => {
     try {
-      const user = await storage.getUser(req.user.claims.sub);
+      const user = await storage.getUser(req.user.id);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -399,7 +399,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update user profile with card number for automatic matching
   app.post('/api/user/update-card', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { cardNumber } = req.body;
       
       await storage.upsertUser({ 
@@ -432,7 +432,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Start automatic polling of Moma API
   app.post('/api/admin/start-moma-sync', isAuthenticated, async (req: any, res) => {
     try {
-      const user = await storage.getUser(req.user.claims.sub);
+      const user = await storage.getUser(req.user.id);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -449,7 +449,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Stop automatic polling
   app.post('/api/admin/stop-moma-sync', isAuthenticated, async (req: any, res) => {
     try {
-      const user = await storage.getUser(req.user.claims.sub);
+      const user = await storage.getUser(req.user.id);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -466,7 +466,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // CSV Upload endpoint for Moma transaction data
   app.post('/api/admin/upload-csv', isAuthenticated, async (req: any, res) => {
     try {
-      const user = await storage.getUser(req.user.claims.sub);
+      const user = await storage.getUser(req.user.id);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -524,7 +524,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Enhanced reward redemption system
   app.post("/api/rewards/redeem", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { rewardId } = req.body;
 
       const user = await storage.getUser(userId);
@@ -575,7 +575,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Validate redemption code (for vending machine operators)
   app.post("/api/admin/validate-redemption", isAuthenticated, async (req: any, res) => {
     try {
-      const user = await storage.getUser(req.user.claims.sub);
+      const user = await storage.getUser(req.user.id);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -617,7 +617,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // AWS Integration routes
   app.post("/api/admin/aws-sync/start", isAuthenticated, async (req: any, res) => {
     try {
-      const user = await storage.getUser(req.user.claims.sub);
+      const user = await storage.getUser(req.user.id);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -637,7 +637,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/admin/aws-sync/stop", isAuthenticated, async (req: any, res) => {
     try {
-      const user = await storage.getUser(req.user.claims.sub);
+      const user = await storage.getUser(req.user.id);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -657,7 +657,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/admin/aws-sync/test", isAuthenticated, async (req: any, res) => {
     try {
-      const user = await storage.getUser(req.user.claims.sub);
+      const user = await storage.getUser(req.user.id);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -677,7 +677,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/admin/aws-sync/status", isAuthenticated, async (req: any, res) => {
     try {
-      const user = await storage.getUser(req.user.claims.sub);
+      const user = await storage.getUser(req.user.id);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -694,7 +694,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/admin/aws-sync/manual", isAuthenticated, async (req: any, res) => {
     try {
-      const user = await storage.getUser(req.user.claims.sub);
+      const user = await storage.getUser(req.user.id);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -757,7 +757,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // QR Code scanner for manual point addition
   app.post("/api/scan-purchase", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { machineId, amount } = req.body;
 
       if (!machineId || !amount) {
