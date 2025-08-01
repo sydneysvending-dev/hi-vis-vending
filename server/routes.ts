@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupAuth, isAuthenticated } from "./auth";
 import { insertTransactionSchema, insertRewardSchema, insertMachineSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -12,7 +12,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const user = await storage.getUser(userId);
       res.json(user);
     } catch (error) {
@@ -23,7 +23,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/auth/complete-profile', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { fullName, suburb } = req.body;
       
       if (!fullName || !fullName.trim() || !suburb || !suburb.trim()) {

@@ -14,19 +14,23 @@ import Profile from "@/pages/profile";
 import Admin from "@/pages/admin";
 import Referral from "@/pages/referral";
 import CompleteProfile from "@/pages/complete-profile";
+import Signup from "@/pages/signup";
+import Login from "@/pages/login";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
 
-  // Check if user needs to complete their profile (missing suburb)
-  const needsProfileCompletion = isAuthenticated && user && !user.suburb;
-
   return (
     <Switch>
-      {isLoading || !isAuthenticated ? (
-        <Route path="/" component={Landing} />
-      ) : needsProfileCompletion ? (
-        <Route path="*" component={CompleteProfile} />
+      {isLoading ? (
+        <Route path="*" component={Landing} />
+      ) : !isAuthenticated ? (
+        <>
+          <Route path="/" component={Signup} />
+          <Route path="/signup" component={Signup} />
+          <Route path="/login" component={Login} />
+          <Route component={Signup} />
+        </>
       ) : (
         <>
           <Route path="/" component={Home} />

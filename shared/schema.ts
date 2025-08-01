@@ -27,9 +27,11 @@ export const sessions = pgTable(
 // User storage table.
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  email: varchar("email").unique(),
-  firstName: varchar("first_name"),
+  email: varchar("email").unique().notNull(),
+  firstName: varchar("first_name").notNull(),
   lastName: varchar("last_name"),
+  password: varchar("password").notNull(),
+  mobile: varchar("mobile").notNull(),
   profileImageUrl: varchar("profile_image_url"),
   loyaltyTier: varchar("loyalty_tier").default("apprentice"), // apprentice, tradie, foreman
   totalPoints: integer("total_points").default(0),
