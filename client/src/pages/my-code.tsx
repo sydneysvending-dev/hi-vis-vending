@@ -6,6 +6,7 @@ import { QrCode, Gift, Zap, Crown, Copy } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { User } from "@shared/schema";
+import Navigation from "@/components/Navigation";
 
 // QR Code Generator Component
 function QRCodeGenerator({ data }: { data: string }) {
@@ -140,7 +141,7 @@ export default function MyCode() {
   const benefits = getPromotionBenefits((user as any)?.currentTier || 'Apprentice');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50 p-4 pb-20">
       <div className="max-w-lg mx-auto space-y-6">
         
         {/* Header */}
@@ -234,6 +235,8 @@ export default function MyCode() {
 
 
       </div>
+      
+      <Navigation />
     </div>
   );
 }
