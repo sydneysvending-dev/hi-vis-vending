@@ -147,7 +147,6 @@ export default function MyCode() {
         {/* Header */}
         <div className="text-center pt-4">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">My QR Code</h1>
-          <p className="text-gray-600">Show this code at any Hi-Vis vending machine</p>
         </div>
 
         {/* QR Code Display */}
