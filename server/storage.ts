@@ -468,6 +468,30 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.cardNumber, cardNumber));
     return user;
   }
+
+  // QR code scan operations
+  async createQRScan(scanData: any): Promise<any> {
+    const [scan] = await db
+      .insert(qrScans)
+      .values(scanData)
+      .returning();
+    return scan;
+  }
+
+  async getQRScans(userId?: string, machineId?: string, limit: number = 50): Promise<any[]> {
+    let query = db.select().from(qrScans);
+    
+    if (userId) {
+      query = query.where(eq(qrScans.userId, userId));
+    }
+    if (machineId) {
+      query = query.where(eq(qrScans.machineId, machineId));
+    }
+    
+    return await query
+      .orderBy(desc(qrScans.createdAt))
+      .limit(limit);
+  }
 }
 
 export const storage = new DatabaseStorage();

@@ -113,6 +113,40 @@ export const machines = pgTable("machines", {
   location: text("location").notNull(),
   isOnline: boolean("is_online").default(true),
   lastPing: timestamp("last_ping").defaultNow(),
+  nayaxDeviceId: varchar("nayax_device_id").unique(), // Nayax DOT device identifier
+  supportedPromotions: varchar("supported_promotions").array(), // Array of promotion types
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// QR code scans for tracking vending machine interactions
+export const qrScans = pgTable("qr_scans", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  machineId: varchar("machine_id").references(() => machines.id),
+  qrData: text("qr_data").notNull(), // Original QR code data
+  scanTimestamp: timestamp("scan_timestamp").defaultNow(),
+  promotionApplied: varchar("promotion_applied"), // Which promotion was triggered
+  pointsAwarded: integer("points_awarded").default(0),
+  discountApplied: integer("discount_applied").default(0), // Percentage discount
+  nayaxTransactionId: varchar("nayax_transaction_id"), // From Nayax API
+  status: varchar("status").default("pending"), // pending, completed, failed
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Nayax promotions configuration
+export const promotions = pgTable("promotions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull(),
+  description: text("description").notNull(),
+  type: varchar("type").notNull(), // discount, bonus_points, free_item
+  tierRequired: varchar("tier_required").notNull(), // Apprentice, Tradie, Foreman
+  discountPercentage: integer("discount_percentage").default(0),
+  bonusPoints: integer("bonus_points").default(0),
+  freeItemCode: varchar("free_item_code"), // Nayax product code for free items
+  isActive: boolean("is_active").default(true),
+  validFrom: timestamp("valid_from").defaultNow(),
+  validUntil: timestamp("valid_until"),
+  maxUsesPerUser: integer("max_uses_per_user").default(1),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -120,6 +154,7 @@ export const machines = pgTable("machines", {
 export const usersRelations = relations(users, ({ many }) => ({
   transactions: many(transactions),
   notifications: many(notifications),
+  qrScans: many(qrScans),
 }));
 
 export const transactionsRelations = relations(transactions, ({ one }) => ({
@@ -141,6 +176,21 @@ export const externalTransactionsRelations = relations(externalTransactions, ({ 
     fields: [externalTransactions.matchedUserId],
     references: [users.id],
   }),
+}));
+
+export const qrScansRelations = relations(qrScans, ({ one }) => ({
+  user: one(users, {
+    fields: [qrScans.userId],
+    references: [users.id],
+  }),
+  machine: one(machines, {
+    fields: [qrScans.machineId],
+    references: [machines.id],
+  }),
+}));
+
+export const promotionsRelations = relations(promotions, ({ many }) => ({
+  // Relations can be added as needed
 }));
 
 // Schema types
@@ -184,10 +234,34 @@ export const insertExternalTransactionSchema = createInsertSchema(externalTransa
   timestamp: true,
 });
 
+export const insertQRScanSchema = createInsertSchema(qrScans).pick({
+  userId: true,
+  machineId: true,
+  qrData: true,
+  promotionApplied: true,
+  pointsAwarded: true,
+  discountApplied: true,
+  nayaxTransactionId: true,
+});
+
+export const insertPromotionSchema = createInsertSchema(promotions).pick({
+  name: true,
+  description: true,
+  type: true,
+  tierRequired: true,
+  discountPercentage: true,
+  bonusPoints: true,
+  freeItemCode: true,
+});
+
 export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
 export type Transaction = typeof transactions.$inferSelect;
 export type Reward = typeof rewards.$inferSelect;
 export type Machine = typeof machines.$inferSelect;
+export type QRScan = typeof qrScans.$inferSelect;
+export type Promotion = typeof promotions.$inferSelect;
+export type InsertQRScan = z.infer<typeof insertQRScanSchema>;
+export type InsertPromotion = z.infer<typeof insertPromotionSchema>;
 export type Notification = typeof notifications.$inferSelect;
 export type InsertNotification = z.infer<typeof insertNotificationSchema>;
 export type ExternalTransaction = typeof externalTransactions.$inferSelect;

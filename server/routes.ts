@@ -686,6 +686,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // QR Code validation for Nayax DOT integration
+  app.post("/api/qr/validate", async (req: any, res) => {
+    try {
+      const { qrData, machineId } = req.body;
+
+      if (!qrData) {
+        return res.status(400).json({ message: "QR code data required" });
+      }
+
+      const { nayaxIntegration } = await import("./nayaxIntegration");
+      const result = await nayaxIntegration.validateQRCode(qrData, machineId);
+
+      if (!result.isValid) {
+        return res.status(400).json(result);
+      }
+
+      // Record the scan
+      if (result.user) {
+        await nayaxIntegration.recordQRScan(
+          result.user.id,
+          machineId,
+          qrData,
+          result.promotions,
+          result.pointsBonus,
+          result.discountPercentage
+        );
+
+        // If there are promotions, push them to the Nayax machine
+        if (result.promotions.length > 0 && machineId) {
+          for (const promotion of result.promotions) {
+            await nayaxIntegration.pushPromotionToMachine(machineId, promotion);
+          }
+        }
+      }
+
+      res.json(result);
+    } catch (error) {
+      console.error("QR validation error:", error);
+      res.status(500).json({ message: "Failed to validate QR code" });
+    }
+  });
+
   // QR Code scanner for manual point addition
   app.post("/api/scan-purchase", isAuthenticated, async (req: any, res) => {
     try {

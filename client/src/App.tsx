@@ -8,6 +8,7 @@ import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
 import Home from "@/pages/home";
 import Scan from "@/pages/scan";
+import QRScanner from "@/pages/qr-scanner";
 import Rewards from "@/pages/rewards";
 import Profile from "@/pages/profile";
 import Admin from "@/pages/admin";
@@ -24,6 +25,7 @@ function Router() {
         <>
           <Route path="/" component={Home} />
           <Route path="/scan" component={Scan} />
+          <Route path="/qr-scanner" component={QRScanner} />
           <Route path="/referral" component={Referral} />
           <Route path="/rewards" component={Rewards} />
           <Route path="/profile" component={Profile} />
