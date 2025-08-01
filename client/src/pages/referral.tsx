@@ -274,6 +274,39 @@ export default function Referral() {
             </Card>
           </div>
         </section>
+
+        {/* How to Use Your QR Code */}
+        <section>
+          <Card className="bg-slate-700 border-slate-600">
+            <CardContent className="p-6">
+              <h3 className="text-orange-400 text-lg font-semibold mb-4">
+                📱 How to Use Your QR Code at Vending Machines
+              </h3>
+              <ol className="space-y-3 text-sm text-slate-300">
+                <li className="flex gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 bg-orange-500 text-slate-800 rounded-full flex items-center justify-center text-xs font-semibold">1</span>
+                  <span>Approach any Hi-Vis vending machine</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 bg-orange-500 text-slate-800 rounded-full flex items-center justify-center text-xs font-semibold">2</span>
+                  <span>Select "Scan QR Code" on the machine screen</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 bg-orange-500 text-slate-800 rounded-full flex items-center justify-center text-xs font-semibold">3</span>
+                  <span>Go to "My Code" tab and show your QR code to the scanner</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 bg-orange-500 text-slate-800 rounded-full flex items-center justify-center text-xs font-semibold">4</span>
+                  <span>Your tier promotions will be applied automatically!</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 bg-orange-500 text-slate-800 rounded-full flex items-center justify-center text-xs font-semibold">5</span>
+                  <span>Complete your purchase and earn bonus points</span>
+                </li>
+              </ol>
+            </CardContent>
+          </Card>
+        </section>
       </main>
 
       <Navigation />
