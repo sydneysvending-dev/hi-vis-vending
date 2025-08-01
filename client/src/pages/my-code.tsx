@@ -9,12 +9,12 @@ import { User } from "@shared/schema";
 
 // QR Code Generator Component
 function QRCodeGenerator({ data }: { data: string }) {
-  const size = 240;
+  const size = 300;
   const qrValue = encodeURIComponent(data);
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${qrValue}&bgcolor=ffffff&color=ea580c&format=png&margin=10&ecc=H`;
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${qrValue}&bgcolor=ffffff&color=ea580c&format=png&margin=8&ecc=H`;
   
   return (
-    <div className="flex justify-center p-4 bg-gradient-to-br from-orange-50 to-yellow-50 rounded-xl border-2 border-orange-200 shadow-lg">
+    <div className="flex justify-center p-6 bg-gradient-to-br from-orange-50 to-yellow-50 rounded-xl border-2 border-orange-200 shadow-lg">
       <img 
         src={qrUrl} 
         alt="Your Personal Hi-Vis QR Code" 
@@ -148,18 +148,6 @@ export default function MyCode() {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">My QR Code</h1>
           <p className="text-gray-600">Show this code at any Hi-Vis vending machine</p>
         </div>
-
-        {/* User Info & Tier */}
-        <Card className="border-orange-200">
-          <CardContent className="p-6 text-center">
-            <div className="mb-4">
-              <h2 className="text-xl font-semibold text-gray-800 mb-2">
-                Hey {(user as any)?.firstName || 'Hi-Vis Customer'}! 👋
-              </h2>
-              <TierBadge tier={(user as any)?.currentTier || 'Apprentice'} points={(user as any)?.totalPoints || 0} />
-            </div>
-          </CardContent>
-        </Card>
 
         {/* QR Code Display */}
         <Card className="border-orange-200">
