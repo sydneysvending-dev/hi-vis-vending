@@ -65,48 +65,19 @@ export default function Scan() {
           </div>
         </div>
 
-        {/* Info Card */}
-        <Card className="mb-6 border-orange-200">
+        {/* Redirect to My Code */}
+        <Card className="border-orange-200">
           <CardContent className="p-6 text-center">
-            <QrCode className="w-12 h-12 mx-auto mb-4 text-orange-600" />
-            <h2 className="text-xl font-semibold mb-2">Looking for your personal QR code?</h2>
+            <QrCode className="w-16 h-16 mx-auto mb-4 text-orange-600" />
+            <h2 className="text-xl font-semibold mb-2">QR Scanner Moved</h2>
             <p className="text-gray-600 mb-4">
-              Each customer now has their own unique QR code for instant promotions at vending machines.
+              The scanner feature has been replaced with personalized QR codes. Each customer now has their own unique code.
             </p>
             <Link href="/my-code">
               <Button className="bg-orange-600 hover:bg-orange-700 text-white">
                 Go to My Code
               </Button>
             </Link>
-          </CardContent>
-        </Card>
-
-        {/* Legacy Scanner */}
-        <Card className="border-orange-200">
-          <CardContent className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Manual Points Entry</h3>
-            <p className="text-gray-600 mb-4">
-              Use this to manually add points for purchases (fallback method).
-            </p>
-            
-            {!isScanning && !scanResult && (
-              <Button 
-                onClick={handleStartScan}
-                className="w-full bg-orange-600 hover:bg-orange-700 text-white"
-              >
-                Start Manual Scanner
-              </Button>
-            )}
-            
-            {scanResult && (
-              <div className="text-center">
-                <CheckCircle className="w-12 h-12 mx-auto mb-4 text-green-600" />
-                <h3 className="text-lg font-semibold mb-2">Points Added!</h3>
-                <p className="text-gray-600">
-                  You earned {scanResult.pointsEarned} points from your purchase.
-                </p>
-              </div>
-            )}
           </CardContent>
         </Card>
       </div>

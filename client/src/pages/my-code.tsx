@@ -2,25 +2,25 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Smartphone, QrCode, Gift, Zap, Crown, Copy, RefreshCw, Shield } from "lucide-react";
+import { QrCode, Gift, Zap, Crown, Copy } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { User } from "@shared/schema";
 
 // QR Code Generator Component
 function QRCodeGenerator({ data }: { data: string }) {
-  const size = 280;
+  const size = 240;
   const qrValue = encodeURIComponent(data);
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${qrValue}&bgcolor=ffffff&color=ea580c&format=png&margin=15&ecc=H`;
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${qrValue}&bgcolor=ffffff&color=ea580c&format=png&margin=10&ecc=H`;
   
   return (
-    <div className="flex justify-center p-6 bg-gradient-to-br from-orange-50 to-yellow-50 rounded-xl border-2 border-orange-200 shadow-lg">
+    <div className="flex justify-center p-4 bg-gradient-to-br from-orange-50 to-yellow-50 rounded-xl border-2 border-orange-200 shadow-lg">
       <img 
         src={qrUrl} 
         alt="Your Personal Hi-Vis QR Code" 
         width={size} 
         height={size}
-        className="rounded-lg shadow-md"
+        className="rounded-lg shadow-md max-w-full h-auto"
       />
     </div>
   );
@@ -82,17 +82,6 @@ export default function MyCode() {
     }
   }, [user]);
 
-  // Manual refresh function
-  const refreshQRCode = () => {
-    const newQrData = generateQRData();
-    setQrData(newQrData);
-    setLastGenerated(new Date());
-    toast({
-      title: "QR Code Refreshed",
-      description: "Your personal QR code has been updated with current tier and points.",
-    });
-  };
-
   // Copy QR data to clipboard
   const copyQRData = async () => {
     try {
@@ -115,7 +104,6 @@ export default function MyCode() {
     const benefits: Record<string, string[]> = {
       'Apprentice': [
         '🎯 10% discount on any purchase',
-        '🥗 25 bonus points for healthy snacks',
         '🆕 Welcome promotions'
       ],
       'Tradie': [
@@ -150,7 +138,6 @@ export default function MyCode() {
   }
 
   const benefits = getPromotionBenefits((user as any)?.currentTier || 'Apprentice');
-  const timeUntilExpiry = lastGenerated ? new Date(lastGenerated.getTime() + 24 * 60 * 60 * 1000) : null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50 p-4">
@@ -188,33 +175,17 @@ export default function MyCode() {
           <CardContent className="space-y-4">
             {qrData && <QRCodeGenerator data={qrData} />}
             
-            {/* Action Buttons */}
-            <div className="flex gap-2">
-              <Button 
-                onClick={refreshQRCode}
-                variant="outline" 
-                className="flex-1 border-orange-200 hover:bg-orange-50"
-              >
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Refresh
-              </Button>
+            {/* Action Button */}
+            <div className="flex justify-center">
               <Button 
                 onClick={copyQRData}
                 variant="outline"
-                className="flex-1 border-orange-200 hover:bg-orange-50"
+                className="border-orange-200 hover:bg-orange-50"
               >
                 <Copy className="w-4 h-4 mr-2" />
                 Copy Data
               </Button>
             </div>
-
-            {/* Security Info */}
-            {timeUntilExpiry && (
-              <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
-                <Shield className="w-4 h-4" />
-                <span>Expires: {timeUntilExpiry.toLocaleString()}</span>
-              </div>
-            )}
           </CardContent>
         </Card>
 
@@ -272,19 +243,7 @@ export default function MyCode() {
           </CardContent>
         </Card>
 
-        {/* Safety Note */}
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <div className="flex items-start gap-3">
-            <Shield className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <h4 className="font-semibold text-yellow-800 mb-1">Security Note</h4>
-              <p className="text-sm text-yellow-700">
-                Your QR code is unique to you and expires every 24 hours for security. 
-                Never share your QR code with others.
-              </p>
-            </div>
-          </div>
-        </div>
+
 
       </div>
     </div>
