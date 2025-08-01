@@ -36,6 +36,13 @@ export default function Admin() {
   const [csvData, setCsvData] = useState("");
   const [redemptionCode, setRedemptionCode] = useState("");
 
+  // AWS sync state
+  const [awsStatus, setAwsStatus] = useState({
+    isRunning: false,
+    bucketName: "",
+    connectionStatus: "unknown"
+  });
+
   // Query admin stats
   const { data: stats } = useQuery({
     queryKey: ["/api/admin/stats"],
@@ -219,6 +226,72 @@ export default function Admin() {
     },
   });
 
+  // AWS sync mutations
+  const startAwsSyncMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/admin/aws-sync/start", {});
+      return response.json();
+    },
+    onSuccess: () => {
+      setAwsStatus(prev => ({ ...prev, isRunning: true }));
+      toast({
+        title: "AWS Sync Started",
+        description: "Automatic sync with AWS services is now active",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Failed to Start AWS Sync",
+        description: error.message || "Could not start AWS sync service",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const stopAwsSyncMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/admin/aws-sync/stop", {});
+      return response.json();
+    },
+    onSuccess: () => {
+      setAwsStatus(prev => ({ ...prev, isRunning: false }));
+      toast({
+        title: "AWS Sync Stopped",
+        description: "Automatic sync has been disabled",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Failed to Stop AWS Sync",
+        description: error.message || "Could not stop AWS sync service",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const testAwsConnectionMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/admin/aws-sync/test", {});
+      return response.json();
+    },
+    onSuccess: (data) => {
+      setAwsStatus(prev => ({ ...prev, connectionStatus: data.success ? "connected" : "failed" }));
+      toast({
+        title: data.success ? "AWS Connection Successful" : "AWS Connection Failed",
+        description: data.message,
+        variant: data.success ? "default" : "destructive",
+      });
+    },
+    onError: (error) => {
+      setAwsStatus(prev => ({ ...prev, connectionStatus: "failed" }));
+      toast({
+        title: "AWS Connection Test Failed",
+        description: error.message || "Could not test AWS connection",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Redirect if not admin
   useEffect(() => {
     if (!isLoading && (!isAuthenticated || !user?.isAdmin)) {
@@ -364,7 +437,7 @@ export default function Admin() {
 
         {/* Admin Tabs */}
         <Tabs defaultValue="notifications" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 bg-slate-700">
+          <TabsList className="grid w-full grid-cols-5 bg-slate-700">
             <TabsTrigger value="notifications" className="data-[state=active]:bg-orange-500 data-[state=active]:text-slate-800">
               <Bell className="w-4 h-4 mr-2" />
               Notifications
@@ -380,6 +453,10 @@ export default function Admin() {
             <TabsTrigger value="moma" className="data-[state=active]:bg-orange-500 data-[state=active]:text-slate-800">
               <Link2 className="w-4 h-4 mr-2" />
               Moma Sync
+            </TabsTrigger>
+            <TabsTrigger value="aws" className="data-[state=active]:bg-blue-500 data-[state=active]:text-slate-800">
+              <Wifi className="w-4 h-4 mr-2" />
+              AWS Integration
             </TabsTrigger>
           </TabsList>
 
@@ -672,6 +749,111 @@ export default function Admin() {
                   <div className="bg-orange-100 border border-orange-400 p-3 rounded">
                     <p className="text-orange-800 text-sm font-semibold">
                       💡 Pro Tip: For best results, have customers link their payment card numbers in their Hi-Vis profiles for automatic matching.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* AWS Integration Tab */}
+          <TabsContent value="aws" className="space-y-6">
+            <Card className="bg-slate-700 border-slate-600">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center">
+                  <Wifi className="w-5 h-5 mr-2 text-blue-500" />
+                  AWS Integration for Moma Data Transfer
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-slate-800 rounded-lg">
+                  <div>
+                    <h4 className="text-white font-semibold">AWS Sync Status</h4>
+                    <p className="text-slate-400 text-sm">
+                      {awsStatus.isRunning 
+                        ? "Monitoring AWS S3 and SQS for new transactions" 
+                        : "AWS sync is currently stopped"}
+                    </p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    {awsStatus.isRunning ? (
+                      <CheckCircle className="w-6 h-6 text-green-400" />
+                    ) : (
+                      <WifiOff className="w-6 h-6 text-slate-400" />
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Button
+                    onClick={() => startAwsSyncMutation.mutate()}
+                    disabled={startAwsSyncMutation.isPending || awsStatus.isRunning}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    {startAwsSyncMutation.isPending ? "Starting..." : "Start AWS Sync"}
+                  </Button>
+
+                  <Button
+                    onClick={() => stopAwsSyncMutation.mutate()}
+                    disabled={stopAwsSyncMutation.isPending || !awsStatus.isRunning}
+                    className="bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    <Square className="w-4 h-4 mr-2" />
+                    {stopAwsSyncMutation.isPending ? "Stopping..." : "Stop AWS Sync"}
+                  </Button>
+
+                  <Button
+                    onClick={() => testAwsConnectionMutation.mutate()}
+                    disabled={testAwsConnectionMutation.isPending}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <Wifi className="w-4 h-4 mr-2" />
+                    {testAwsConnectionMutation.isPending ? "Testing..." : "Test Connection"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* AWS Setup Instructions */}
+            <Card className="bg-slate-700 border-slate-600">
+              <CardHeader>
+                <CardTitle className="text-white">AWS Configuration Setup</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-4 text-slate-300">
+                  <div>
+                    <h4 className="text-white font-semibold mb-2">Step 1: AWS Credentials</h4>
+                    <p className="text-sm mb-2">Set up your AWS credentials for Hi-Vis Vending integration:</p>
+                    <div className="bg-slate-800 p-3 rounded font-mono text-xs space-y-1">
+                      <div>AWS_ACCESS_KEY_ID=your_access_key</div>
+                      <div>AWS_SECRET_ACCESS_KEY=your_secret_key</div>
+                      <div>AWS_REGION=us-east-1</div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-white font-semibold mb-2">Step 2: S3 Bucket Setup</h4>
+                    <p className="text-sm mb-2">Configure Moma app to upload transaction files to S3:</p>
+                    <div className="bg-slate-800 p-3 rounded font-mono text-xs space-y-1">
+                      <div>Bucket: hi-vis-moma-data</div>
+                      <div>Folder: transactions/</div>
+                      <div>Format: JSON files with transaction data</div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-white font-semibold mb-2">Step 3: SQS Queue (Optional)</h4>
+                    <p className="text-sm mb-2">For real-time notifications:</p>
+                    <div className="bg-slate-800 p-3 rounded font-mono text-xs">
+                      <div>Queue: hi-vis-transaction-notifications</div>
+                    </div>
+                  </div>
+
+                  <div className="bg-blue-100 border border-blue-400 p-3 rounded">
+                    <p className="text-blue-800 text-sm font-semibold">
+                      ⚡ AWS Integration automatically processes transactions from both S3 files and SQS messages, 
+                      providing seamless sync with your Moma vending machines.
                     </p>
                   </div>
                 </div>

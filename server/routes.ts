@@ -588,6 +588,104 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // AWS Integration routes
+  app.post("/api/admin/aws-sync/start", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user.claims.sub);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { awsMomaSync } = await import("./awsIntegration");
+      await awsMomaSync.startSync();
+      
+      res.json({ 
+        success: true, 
+        message: "AWS sync started successfully" 
+      });
+    } catch (error) {
+      console.error("Error starting AWS sync:", error);
+      res.status(500).json({ message: "Failed to start AWS sync" });
+    }
+  });
+
+  app.post("/api/admin/aws-sync/stop", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user.claims.sub);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { awsMomaSync } = await import("./awsIntegration");
+      awsMomaSync.stopSync();
+      
+      res.json({ 
+        success: true, 
+        message: "AWS sync stopped successfully" 
+      });
+    } catch (error) {
+      console.error("Error stopping AWS sync:", error);
+      res.status(500).json({ message: "Failed to stop AWS sync" });
+    }
+  });
+
+  app.post("/api/admin/aws-sync/test", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user.claims.sub);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { awsMomaSync } = await import("./awsIntegration");
+      const result = await awsMomaSync.testConnection();
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Error testing AWS connection:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to test AWS connection" 
+      });
+    }
+  });
+
+  app.get("/api/admin/aws-sync/status", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user.claims.sub);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { awsMomaSync } = await import("./awsIntegration");
+      const status = awsMomaSync.getStatus();
+      
+      res.json(status);
+    } catch (error) {
+      console.error("Error getting AWS sync status:", error);
+      res.status(500).json({ message: "Failed to get AWS sync status" });
+    }
+  });
+
+  app.post("/api/admin/aws-sync/manual", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user.claims.sub);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { awsMomaSync } = await import("./awsIntegration");
+      const result = await awsMomaSync.triggerManualSync();
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Error triggering manual AWS sync:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to trigger manual sync" 
+      });
+    }
+  });
+
   // QR Code scanner for manual point addition
   app.post("/api/scan-purchase", isAuthenticated, async (req: any, res) => {
     try {

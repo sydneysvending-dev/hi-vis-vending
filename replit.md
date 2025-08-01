@@ -141,3 +141,17 @@ The system now supports fully automated point updates without user interaction, 
 - **Modal Display**: Customers see redemption codes in a prominent modal with copy-to-clipboard functionality
 - **Code Validation**: Admin dashboard includes tools to validate redemption codes and mark them as used
 - **Customer Notifications**: Automatic notifications sent when rewards are redeemed with redemption instructions
+
+### AWS Integration for Moma Data Transfer (January 2025)
+- **S3 Bucket Monitoring**: Automatically processes transaction files uploaded by Moma app to AWS S3
+- **SQS Real-time Sync**: Optional SQS queue integration for instant transaction notifications
+- **Automated Processing**: Converts AWS data to Hi-Vis transactions and awards points automatically
+- **Admin Controls**: Full AWS sync management through admin dashboard (start/stop/test connections)
+- **Dual Data Sources**: Supports both batch file processing and real-time message queues
+- **Comprehensive Setup**: Complete AWS configuration guide with IAM, S3, and SQS setup instructions
+
+The system now provides four complete integration methods:
+1. **AWS S3/SQS Integration**: Automatic sync with cloud services (recommended for scale)
+2. **CSV Import**: Manual upload of exported transaction data
+3. **QR Code Scanning**: Customer-initiated point collection
+4. **API Webhook**: Direct HTTP endpoint for real-time integration
