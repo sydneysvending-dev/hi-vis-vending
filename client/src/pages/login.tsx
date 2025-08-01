@@ -117,7 +117,20 @@ export default function Login() {
                 {loginMutation.isPending ? "Logging In..." : "Log In"}
               </Button>
 
-              <div className="text-center pt-4">
+              <div className="text-center pt-4 space-y-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    toast({
+                      title: "Password Reset",
+                      description: "Please contact support to reset your password: support@hivisvending.com",
+                    });
+                  }}
+                  className="text-sm text-orange-600 hover:text-orange-700 underline"
+                >
+                  Forgot your password?
+                </button>
+                
                 <p className="text-gray-600">
                   Don't have an account?{" "}
                   <Link href="/signup" className="text-orange-600 hover:text-orange-700 font-medium">
