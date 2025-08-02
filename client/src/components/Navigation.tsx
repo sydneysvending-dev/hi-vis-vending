@@ -1,5 +1,5 @@
 import { useLocation } from "wouter";
-import { Home, QrCode, Gift, User, Users } from "lucide-react";
+import { Home, QrCode, Gift, User, Trophy } from "lucide-react";
 import { Link } from "wouter";
 
 export default function Navigation() {
@@ -36,15 +36,15 @@ export default function Navigation() {
           </button>
         </Link>
         
-        <Link href="/referral" className="flex-1">
+        <Link href="/leaderboard" className="flex-1">
           <button className="w-full py-3 px-2 text-center">
-            <Users className={`w-4 h-4 mx-auto mb-1 ${
-              isActive('/referral') ? 'text-orange-500' : 'text-slate-400'
+            <Trophy className={`w-4 h-4 mx-auto mb-1 ${
+              isActive('/leaderboard') ? 'text-orange-500' : 'text-slate-400'
             }`} />
             <span className={`text-xs font-medium ${
-              isActive('/referral') ? 'text-orange-500' : 'text-slate-400'
+              isActive('/leaderboard') ? 'text-orange-500' : 'text-slate-400'
             }`}>
-              Refer
+              Leaderboard
             </span>
           </button>
         </Link>

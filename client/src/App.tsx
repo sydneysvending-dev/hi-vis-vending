@@ -12,7 +12,7 @@ import MyCode from "@/pages/my-code";
 import Rewards from "@/pages/rewards";
 import Profile from "@/pages/profile";
 import Admin from "@/pages/admin";
-import Referral from "@/pages/referral";
+import Leaderboard from "@/pages/leaderboard";
 import CompleteProfile from "@/pages/complete-profile";
 import Signup from "@/pages/signup";
 import Login from "@/pages/login";
@@ -41,7 +41,7 @@ function Router() {
           <Route path="/" component={Home} />
           <Route path="/scan" component={Scan} />
           <Route path="/my-code" component={MyCode} />
-          <Route path="/referral" component={Referral} />
+          <Route path="/leaderboard" component={Leaderboard} />
           <Route path="/rewards" component={Rewards} />
           <Route path="/profile" component={Profile} />
           <Route path="/admin" component={Admin} />

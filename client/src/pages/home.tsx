@@ -1,23 +1,55 @@
-import { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
+import { apiRequest } from "@/lib/queryClient";
 import Navigation from "@/components/Navigation";
 import LoyaltyProgress from "@/components/LoyaltyProgress";
 import PunchCard from "@/components/PunchCard";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { QrCode, Gift, HardHat, Bell } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { QrCode, Gift, HardHat, Bell, Users, Copy, Share2 } from "lucide-react";
 import { Link } from "wouter";
 
 export default function Home() {
+  const [referralCodeInput, setReferralCodeInput] = useState("");
   const { toast } = useToast();
   const { user, isAuthenticated, isLoading } = useAuth();
+  const queryClient = useQueryClient();
 
   const { data: transactions } = useQuery({
     queryKey: ["/api/user/transactions"],
     enabled: isAuthenticated,
+  });
+
+  const { data: myReferralData } = useQuery({
+    queryKey: ["/api/referral/my-code"],
+    enabled: isAuthenticated,
+  });
+
+  const useReferralMutation = useMutation({
+    mutationFn: async (referralCode: string) => {
+      const response = await apiRequest("POST", "/api/referral/use-code", { referralCode });
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/user/transactions"] });
+      toast({
+        title: "Welcome Bonus!",
+        description: `You earned ${data.pointsEarned} points for using a referral code!`,
+      });
+      setReferralCodeInput("");
+    },
+    onError: (error) => {
+      toast({
+        title: "Invalid Code",
+        description: error.message || "This referral code is not valid",
+        variant: "destructive",
+      });
+    },
   });
 
   // Redirect to login if not authenticated
@@ -64,6 +96,41 @@ export default function Home() {
   };
 
   const recentTransactions = transactions?.slice(0, 3) || [];
+
+  const handleUseReferralCode = () => {
+    if (!referralCodeInput.trim()) return;
+    useReferralMutation.mutate(referralCodeInput.trim().toUpperCase());
+  };
+
+  const copyReferralCode = () => {
+    if (myReferralData?.referralCode) {
+      navigator.clipboard.writeText(myReferralData.referralCode);
+      toast({
+        title: "Copied!",
+        description: "Your referral code has been copied to clipboard",
+      });
+    }
+  };
+
+  const shareReferralCode = () => {
+    if (myReferralData?.referralCode) {
+      const message = `Join Hi-Vis Vending loyalty program with my code ${myReferralData.referralCode} and get 25 free points! 🏗️`;
+      
+      if (navigator.share) {
+        navigator.share({
+          title: 'Join Hi-Vis Vending',
+          text: message,
+          url: window.location.origin
+        });
+      } else {
+        navigator.clipboard.writeText(message);
+        toast({
+          title: "Copied!",
+          description: "Referral message copied to clipboard",
+        });
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-800">
@@ -196,6 +263,77 @@ export default function Home() {
             </Card>
           </section>
         )}
+
+        {/* Referral Section */}
+        <section className="px-6 py-6">
+          <h3 className="text-white text-lg font-semibold mb-4 flex items-center">
+            <Users className="w-5 h-5 mr-2" />
+            Referrals
+          </h3>
+          
+          {/* My Referral Code */}
+          <Card className="bg-slate-700 border-slate-600 mb-4">
+            <CardContent className="p-6">
+              <div className="text-center mb-4">
+                <h4 className="text-white font-semibold mb-2">Share Your Code</h4>
+                <p className="text-slate-300 text-sm mb-4">
+                  Invite friends and earn 25 points when they join!
+                </p>
+                <div className="bg-slate-800 rounded-lg p-4 mb-4">
+                  <p className="text-orange-400 text-2xl font-bold tracking-wider">
+                    {myReferralData?.referralCode || 'Loading...'}
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <Button 
+                    onClick={copyReferralCode}
+                    className="bg-orange-600 hover:bg-orange-700 text-white"
+                    disabled={!myReferralData?.referralCode}
+                  >
+                    <Copy className="w-4 h-4 mr-2" />
+                    Copy
+                  </Button>
+                  <Button 
+                    onClick={shareReferralCode}
+                    className="bg-slate-600 hover:bg-slate-500 text-white"
+                    disabled={!myReferralData?.referralCode}
+                  >
+                    <Share2 className="w-4 h-4 mr-2" />
+                    Share
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Use Referral Code */}
+          {!user?.hasUsedReferralCode && (
+            <Card className="bg-slate-700 border-slate-600">
+              <CardContent className="p-6">
+                <h4 className="text-white font-semibold mb-2">Have a Referral Code?</h4>
+                <p className="text-slate-300 text-sm mb-4">
+                  Enter a friend's code to get 25 bonus points!
+                </p>
+                <div className="flex gap-3">
+                  <Input
+                    placeholder="Enter code"
+                    value={referralCodeInput}
+                    onChange={(e) => setReferralCodeInput(e.target.value.toUpperCase())}
+                    className="bg-slate-800 border-slate-600 text-white"
+                    maxLength={6}
+                  />
+                  <Button 
+                    onClick={handleUseReferralCode}
+                    disabled={useReferralMutation.isPending || !referralCodeInput.trim()}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    {useReferralMutation.isPending ? "..." : "Use"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </section>
       </main>
 
       <Navigation />
