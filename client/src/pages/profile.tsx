@@ -6,12 +6,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { HardHat, LogOut, History, Star, Trophy, Code } from "lucide-react";
 import { useLocation } from "wouter";
+import { User, Transaction } from "@shared/schema";
 
 export default function Profile() {
-  const { user } = useAuth();
+  const { user } = useAuth() as { user: User | null };
   const [, setLocation] = useLocation();
 
-  const { data: transactions = [] } = useQuery({
+  const { data: transactions = [] } = useQuery<Transaction[]>({
     queryKey: ["/api/user/transactions"],
   });
 
