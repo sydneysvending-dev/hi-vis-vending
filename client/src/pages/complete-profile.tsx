@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { HardHat, MapPin, User } from "lucide-react";
 
 export default function CompleteProfile() {
@@ -15,6 +16,30 @@ export default function CompleteProfile() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Suburb mapping function
+  const mapSuburbToGroup = (selectedSuburb: string): string => {
+    switch (selectedSuburb.toLowerCase()) {
+      case 'seven hills':
+        return 'Girraween';
+      case 'parramatta':
+        return 'Harris Park';
+      case 'wahroonga':
+      case 'girraween':
+      case 'harris park':
+        return selectedSuburb;
+      default:
+        return selectedSuburb;
+    }
+  };
+
+  const suburbOptions = [
+    { value: 'Wahroonga', label: 'Wahroonga' },
+    { value: 'Girraween', label: 'Girraween' },
+    { value: 'Seven Hills', label: 'Seven Hills (counted as Girraween)' },
+    { value: 'Harris Park', label: 'Harris Park' },
+    { value: 'Parramatta', label: 'Parramatta (counted as Harris Park)' },
+  ];
 
   const updateProfileMutation = useMutation({
     mutationFn: async (data: { fullName: string; suburb: string }) => {
@@ -47,9 +72,10 @@ export default function CompleteProfile() {
       });
       return;
     }
+    const mappedSuburb = mapSuburbToGroup(suburb);
     updateProfileMutation.mutate({ 
       fullName: fullName.trim(),
-      suburb: suburb.trim() 
+      suburb: mappedSuburb 
     });
   };
 
@@ -89,22 +115,25 @@ export default function CompleteProfile() {
 
               <div className="space-y-2">
                 <Label htmlFor="suburb" className="text-gray-700 font-medium">
-                  Suburb *
+                  Work Location *
                 </Label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <Input
-                    id="suburb"
-                    type="text"
-                    value={suburb}
-                    onChange={(e) => setSuburb(e.target.value)}
-                    placeholder="e.g. Parramatta, Sydney CBD, Blacktown"
-                    className="pl-10 border-orange-200 focus:border-orange-500"
-                    required
-                  />
-                </div>
+                <Select value={suburb} onValueChange={setSuburb}>
+                  <SelectTrigger className="border-orange-200 focus:border-orange-500">
+                    <div className="flex items-center">
+                      <MapPin className="w-4 h-4 text-gray-400 mr-2" />
+                      <SelectValue placeholder="Select your work location" />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {suburbOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <p className="text-sm text-gray-500">
-                  We use this to group you with other workers in your area for local promotions and offers.
+                  We use this to group you with other workers in your area for local leaderboards and promotions.
                 </p>
               </div>
 

@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { HardHat, Mail, Phone, Lock, User, MapPin } from "lucide-react";
 import { Link, useLocation } from "wouter";
 
@@ -21,6 +22,30 @@ export default function Signup() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
+
+  // Suburb mapping function
+  const mapSuburbToGroup = (selectedSuburb: string): string => {
+    switch (selectedSuburb.toLowerCase()) {
+      case 'seven hills':
+        return 'Girraween';
+      case 'parramatta':
+        return 'Harris Park';
+      case 'wahroonga':
+      case 'girraween':
+      case 'harris park':
+        return selectedSuburb;
+      default:
+        return selectedSuburb;
+    }
+  };
+
+  const suburbOptions = [
+    { value: 'Wahroonga', label: 'Wahroonga' },
+    { value: 'Girraween', label: 'Girraween' },
+    { value: 'Seven Hills', label: 'Seven Hills (counted as Girraween)' },
+    { value: 'Harris Park', label: 'Harris Park' },
+    { value: 'Parramatta', label: 'Parramatta (counted as Harris Park)' },
+  ];
 
   const signupMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
@@ -77,7 +102,11 @@ export default function Signup() {
       return;
     }
 
-    signupMutation.mutate(formData);
+    const mappedSuburb = mapSuburbToGroup(formData.suburb);
+    signupMutation.mutate({
+      ...formData,
+      suburb: mappedSuburb
+    });
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -156,20 +185,26 @@ export default function Signup() {
 
               <div className="space-y-2">
                 <Label htmlFor="suburb" className="text-gray-700 font-medium">
-                  Suburb *
+                  Work Location *
                 </Label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <Input
-                    id="suburb"
-                    type="text"
-                    value={formData.suburb}
-                    onChange={(e) => handleInputChange("suburb", e.target.value)}
-                    placeholder="e.g. Parramatta, Sydney CBD, Blacktown"
-                    className="pl-10 border-orange-200 focus:border-orange-500"
-                    required
-                  />
-                </div>
+                <Select value={formData.suburb} onValueChange={(value) => handleInputChange("suburb", value)}>
+                  <SelectTrigger className="border-orange-200 focus:border-orange-500">
+                    <div className="flex items-center">
+                      <MapPin className="w-4 h-4 text-gray-400 mr-2" />
+                      <SelectValue placeholder="Select your work location" />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {suburbOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-sm text-gray-500">
+                  We use this to group you with other workers in your area for local leaderboards and promotions.
+                </p>
               </div>
 
               <div className="space-y-2">
