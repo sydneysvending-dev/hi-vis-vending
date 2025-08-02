@@ -4,10 +4,12 @@ import Navigation from "@/components/Navigation";
 import LoyaltyProgress from "@/components/LoyaltyProgress";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { HardHat, LogOut, History, Star, Trophy } from "lucide-react";
+import { HardHat, LogOut, History, Star, Trophy, Code } from "lucide-react";
+import { useLocation } from "wouter";
 
 export default function Profile() {
   const { user } = useAuth();
+  const [, setLocation] = useLocation();
 
   const { data: transactions = [] } = useQuery({
     queryKey: ["/api/user/transactions"],
@@ -210,6 +212,17 @@ export default function Profile() {
               </CardContent>
             </Card>
           </section>
+        )}
+
+        {/* Developer Access (Byron only) */}
+        {user.email === 'byron@sydneyselectvending.com.au' && (
+          <Button 
+            onClick={() => setLocation('/developer')}
+            className="w-full flex items-center justify-center space-x-2 mb-4 bg-purple-600 hover:bg-purple-700"
+          >
+            <Code className="w-4 h-4" />
+            <span>Developer Console</span>
+          </Button>
         )}
 
         {/* Logout Button */}
