@@ -156,8 +156,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/admin/stats', isAuthenticated, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user.id);
-      if (!user?.isAdmin) {
-        return res.status(403).json({ message: "Admin access required" });
+      if (!user?.isAdmin && !user?.isDeveloper) {
+        return res.status(403).json({ message: "Admin or developer access required" });
       }
 
       const stats = await storage.getAdminStats();
@@ -171,8 +171,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/admin/users', isAuthenticated, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user.id);
-      if (!user?.isAdmin) {
-        return res.status(403).json({ message: "Admin access required" });
+      if (!user?.isAdmin && !user?.isDeveloper) {
+        return res.status(403).json({ message: "Admin or developer access required" });
       }
 
       const users = await storage.getAllUsers();

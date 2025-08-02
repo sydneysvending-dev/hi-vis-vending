@@ -3,23 +3,33 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Code2, Database, Settings, Users, Activity, AlertTriangle } from "lucide-react";
+import { Code2, Database, Settings, Users, Activity, AlertTriangle, Download, FileText } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { User } from "@shared/schema";
+
+type AdminStats = {
+  totalUsers: number;
+  totalTransactions: number;
+  pointsRedeemed: number;
+  activeMachines: number;
+  activeUsersToday: number;
+  totalPointsEarned: number;
+};
 
 export default function Developer() {
-  const { user } = useAuth();
+  const { user } = useAuth() as { user: User | null };
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("overview");
 
   // Get system stats
-  const { data: stats } = useQuery({
+  const { data: stats } = useQuery<AdminStats>({
     queryKey: ["/api/admin/stats"],
   });
 
   // Get all users for developer analysis
-  const { data: allUsers } = useQuery({
+  const { data: allUsers } = useQuery<User[]>({
     queryKey: ["/api/admin/users"],
   });
 
@@ -52,6 +62,63 @@ export default function Developer() {
     toast({
       title: "Developer Action",
       description: `${action} functionality would be implemented here`,
+    });
+  };
+
+  const generateUserReport = () => {
+    if (!allUsers) {
+      toast({
+        title: "No Data",
+        description: "User data not available for report generation",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const report = {
+      generated: new Date().toISOString(),
+      totalUsers: allUsers.length,
+      usersByTier: {
+        apprentice: allUsers.filter(u => u.loyaltyTier === 'apprentice').length,
+        tradie: allUsers.filter(u => u.loyaltyTier === 'tradie').length,
+        foreman: allUsers.filter(u => u.loyaltyTier === 'foreman').length,
+      },
+      usersBySuburb: allUsers.reduce((acc: Record<string, number>, user) => {
+        const suburb = user.suburb || 'Unknown';
+        acc[suburb] = (acc[suburb] || 0) + 1;
+        return acc;
+      }, {}),
+      totalPoints: allUsers.reduce((sum, user) => sum + (user.totalPoints || 0), 0),
+      avgPointsPerUser: allUsers.length > 0 ? 
+        Math.round(allUsers.reduce((sum, user) => sum + (user.totalPoints || 0), 0) / allUsers.length) : 0,
+      activeUsers: allUsers.filter(u => (u.totalPoints || 0) > 0).length,
+      users: allUsers.map(user => ({
+        id: user.id,
+        email: user.email,
+        name: `${user.firstName} ${user.lastName || ''}`.trim(),
+        suburb: user.suburb,
+        tier: user.loyaltyTier,
+        points: user.totalPoints,
+        isAdmin: user.isAdmin,
+        isDeveloper: user.isDeveloper,
+        joinDate: user.createdAt,
+      }))
+    };
+
+    const dataStr = JSON.stringify(report, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `hi-vis-user-report-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: "Report Generated",
+      description: `User report downloaded with ${allUsers.length} users`,
     });
   };
 
@@ -157,11 +224,12 @@ export default function Developer() {
                   </Button>
                   
                   <Button
-                    onClick={() => handleDatabaseAction("Export user data")}
+                    onClick={generateUserReport}
                     variant="outline"
-                    className="w-full border-orange-200"
+                    className="w-full border-orange-200 hover:bg-orange-50"
                   >
-                    Export Data
+                    <Download className="w-4 h-4 mr-2" />
+                    Generate User Report
                   </Button>
                   
                   <Button
@@ -175,17 +243,17 @@ export default function Developer() {
                 
                 <Separator />
                 
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                  <h4 className="font-semibold text-red-800 mb-2">⚠️ Danger Zone</h4>
-                  <p className="text-red-700 text-sm mb-3">
-                    These actions cannot be undone and will affect all users.
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                  <h4 className="font-semibold text-orange-800 mb-2">📊 Data Analysis</h4>
+                  <p className="text-orange-700 text-sm mb-3">
+                    Generate comprehensive reports for system analysis and business insights.
                   </p>
                   <Button
-                    onClick={() => handleDatabaseAction("Delete all user accounts")}
-                    variant="destructive"
-                    className="bg-red-600 hover:bg-red-700"
+                    onClick={generateUserReport}
+                    className="w-full bg-orange-600 hover:bg-orange-700"
                   >
-                    Delete All Users
+                    <FileText className="w-4 h-4 mr-2" />
+                    Download Detailed Analytics Report
                   </Button>
                 </div>
               </CardContent>
@@ -222,9 +290,10 @@ export default function Developer() {
                   </div>
 
                   <Button
-                    onClick={() => handleDatabaseAction("Generate user report")}
+                    onClick={generateUserReport}
                     className="w-full bg-orange-600 hover:bg-orange-700"
                   >
+                    <Download className="w-4 h-4 mr-2" />
                     Generate Full User Report
                   </Button>
                 </div>
