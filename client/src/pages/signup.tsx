@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { HardHat, Mail, Phone, Lock, User, MapPin } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 
 export default function Signup() {
   const [formData, setFormData] = useState({
@@ -20,6 +20,7 @@ export default function Signup() {
   });
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
 
   const signupMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
@@ -32,6 +33,8 @@ export default function Signup() {
         title: "Welcome to Hi-Vis Vending!",
         description: "Your account has been created successfully.",
       });
+      // Redirect to home page after successful signup
+      setLocation("/");
     },
     onError: (error) => {
       toast({

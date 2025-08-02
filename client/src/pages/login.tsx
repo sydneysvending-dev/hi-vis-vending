@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { HardHat, Mail, Lock } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -16,6 +16,7 @@ export default function Login() {
   });
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
 
   const loginMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
@@ -28,6 +29,8 @@ export default function Login() {
         title: "Welcome Back!",
         description: "You have successfully logged in.",
       });
+      // Redirect to home page after successful login
+      setLocation("/");
     },
     onError: (error) => {
       toast({
