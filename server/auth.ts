@@ -5,6 +5,7 @@ import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
+import { sendEmail, createPasswordResetEmail } from "./sendgrid";
 import { User as SelectUser } from "@shared/schema";
 import connectPg from "connect-pg-simple";
 
@@ -171,10 +172,24 @@ export function setupAuth(app: Express) {
 
       await storage.setPasswordResetToken(user.id, resetToken, resetTokenExpiry);
 
-      // TODO: Send email with reset link
-      // For now, we'll log the reset URL (in production, send email)
+      // Send password reset email
       const resetUrl = `${req.protocol}://${req.get('host')}/reset-password?token=${resetToken}`;
-      console.log(`Password reset URL for ${email}: ${resetUrl}`);
+      const emailContent = createPasswordResetEmail(resetUrl, email);
+      
+      const emailSent = await sendEmail({
+        to: email,
+        from: process.env.SENDGRID_FROM_EMAIL!,
+        subject: emailContent.subject,
+        text: emailContent.text,
+        html: emailContent.html,
+      });
+
+      if (emailSent) {
+        console.log(`Password reset email sent to ${email}`);
+      } else {
+        console.error(`Failed to send password reset email to ${email}`);
+        // Still show success message for security
+      }
       
       res.json({ message: "If an account with that email exists, we've sent reset instructions" });
     } catch (error) {
