@@ -73,6 +73,9 @@ export interface IStorage {
   
   // External transaction matching
   processExternalTransaction(transaction: InsertExternalTransaction): Promise<void>;
+  
+  // Leaderboard operations
+  getLeaderboardBySuburb(): Promise<{ suburb: string; users: Array<User & { rank: number }> }[]>;
   getUnprocessedExternalTransactions(): Promise<ExternalTransaction[]>;
   matchTransactionToUser(externalTransactionId: string, userId: string): Promise<void>;
   getUserByCardNumber(cardNumber: string): Promise<User | undefined>;
@@ -579,6 +582,54 @@ export class DatabaseStorage implements IStorage {
     return await query
       .orderBy(desc(qrScans.createdAt))
       .limit(limit);
+  }
+
+  // Leaderboard operations
+  async getLeaderboardBySuburb(): Promise<{ suburb: string; users: Array<User & { rank: number }> }[]> {
+    // Get all users with points, grouped by suburb
+    const allUsers = await db
+      .select()
+      .from(users)
+      .orderBy(desc(users.totalPoints));
+
+    // Group users by suburb
+    const suburbGroups = new Map<string, User[]>();
+    
+    for (const user of allUsers) {
+      if (!user.suburb) continue;
+      
+      if (!suburbGroups.has(user.suburb)) {
+        suburbGroups.set(user.suburb, []);
+      }
+      suburbGroups.get(user.suburb)!.push(user);
+    }
+
+    // Create leaderboard with rankings for each suburb
+    const leaderboards: { suburb: string; users: Array<User & { rank: number }> }[] = [];
+    
+    for (const [suburb, suburbUsers] of suburbGroups) {
+      // Sort users by points and add ranking
+      const rankedUsers = suburbUsers
+        .sort((a, b) => (b.totalPoints || 0) - (a.totalPoints || 0))
+        .map((user, index) => ({
+          ...user,
+          rank: index + 1
+        }));
+
+      leaderboards.push({
+        suburb,
+        users: rankedUsers
+      });
+    }
+
+    // Sort suburbs by highest total points
+    leaderboards.sort((a, b) => {
+      const aTotal = a.users.reduce((sum, u) => sum + (u.totalPoints || 0), 0);
+      const bTotal = b.users.reduce((sum, u) => sum + (u.totalPoints || 0), 0);
+      return bTotal - aTotal;
+    });
+
+    return leaderboards;
   }
 }
 

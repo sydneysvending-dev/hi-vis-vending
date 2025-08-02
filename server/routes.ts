@@ -810,6 +810,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Leaderboard routes
+  app.get('/api/leaderboard', async (req, res) => {
+    try {
+      const leaderboards = await storage.getLeaderboardBySuburb();
+      res.json(leaderboards);
+    } catch (error) {
+      console.error("Error fetching leaderboard:", error);
+      res.status(500).json({ message: "Failed to fetch leaderboard" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
