@@ -84,11 +84,13 @@ export default function Home() {
               <Bell className="w-5 h-5" />
               <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
             </button>
-            <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
-              <span className="text-slate-800 font-bold text-sm">
-                {user.firstName?.[0] || 'U'}{user.lastName?.[0] || ''}
-              </span>
-            </div>
+            <Link href="/profile">
+              <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center cursor-pointer hover:bg-orange-400 transition-colors">
+                <span className="text-slate-800 font-bold text-sm">
+                  {user.firstName?.[0] || 'U'}{user.lastName?.[0] || ''}
+                </span>
+              </div>
+            </Link>
           </div>
         </div>
       </header>
