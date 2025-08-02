@@ -66,8 +66,8 @@ export default function Leaderboard() {
               <HardHat className="text-slate-800 w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-white font-bold text-lg">Leaderboard</h1>
-              <p className="text-yellow-400 text-xs font-medium">Top loyalty earners</p>
+              <h1 className="text-white font-bold text-lg">Monthly Leaderboard</h1>
+              <p className="text-yellow-400 text-xs font-medium">{new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} Season</p>
             </div>
           </div>
         </div>
@@ -82,6 +82,36 @@ export default function Leaderboard() {
             <p className="text-lg opacity-90">See how you rank against other workers</p>
           </div>
         </div>
+
+        {/* Monthly Prizes Section */}
+        <Card className="bg-gradient-to-r from-yellow-500 to-orange-500 border-0 mb-6">
+          <CardContent className="p-6">
+            <div className="text-center text-slate-800">
+              <Award className="w-12 h-12 mx-auto mb-3" />
+              <h3 className="text-xl font-bold mb-4">Monthly Prizes</h3>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="bg-white/20 rounded-lg p-4">
+                  <Trophy className="w-8 h-8 mx-auto mb-2 text-yellow-600" />
+                  <p className="font-bold text-lg">1st Place</p>
+                  <p className="text-sm">3 Free Large Drinks</p>
+                </div>
+                <div className="bg-white/20 rounded-lg p-4">
+                  <Medal className="w-8 h-8 mx-auto mb-2 text-gray-600" />
+                  <p className="font-bold text-lg">2nd Place</p>
+                  <p className="text-sm">2 Free Large Drinks</p>
+                </div>
+                <div className="bg-white/20 rounded-lg p-4">
+                  <Award className="w-8 h-8 mx-auto mb-2 text-amber-700" />
+                  <p className="font-bold text-lg">3rd Place</p>
+                  <p className="text-sm">1 Free Large Drink</p>
+                </div>
+              </div>
+              <p className="text-sm mt-4 opacity-80">
+                Prizes awarded at the end of each month based on suburb rankings
+              </p>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Current User Stats */}
         {user && (

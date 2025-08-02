@@ -161,3 +161,22 @@ The system now provides four complete integration methods:
 2. **CSV Import**: Manual upload of exported transaction data
 3. **QR Code Scanning**: Customer-initiated point collection
 4. **API Webhook**: Direct HTTP endpoint for real-time integration
+
+### Product-Specific Point System (February 2025)
+- **Smart Point Allocation**: AWS transactions automatically assign different point values based on product type
+- **Large Drinks**: 20 points per purchase (600ml, 750ml, or "large" in product name)
+- **Small Drinks**: 10 points per purchase (250ml, 330ml, cans, bottles, water, soft drinks)
+- **Snacks**: 15 points per purchase (chips, chocolate, bars, biscuits, nuts, crackers)
+- **Fallback System**: 10 points for unrecognized products
+- **Automated Processing**: Point calculation happens automatically during AWS sync without user intervention
+
+### Monthly Season Leaderboard System (February 2025)
+- **Monthly Competitions**: Leaderboard resets automatically each month with seasonal tracking
+- **Season Management**: System creates new seasons automatically (e.g., "January 2025", "February 2025")
+- **Suburb-Based Rankings**: Users compete within their suburb groups for monthly prizes
+- **Monthly Prize Structure**: 
+  - 1st Place: 3 Free Large Drinks
+  - 2nd Place: 2 Free Large Drinks
+  - 3rd Place: 1 Free Large Drink
+- **Automatic Reset**: Points and rankings reset at month end, with historical season data preserved
+- **Visual Integration**: Leaderboard tab displays current month name and prize information prominently

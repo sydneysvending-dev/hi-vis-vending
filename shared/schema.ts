@@ -126,6 +126,30 @@ export const machines = pgTable("machines", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Monthly seasons table for leaderboards
+export const seasons = pgTable("seasons", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  year: integer("year").notNull(),
+  month: integer("month").notNull(), // 1-12
+  name: varchar("name").notNull(), // e.g., "January 2025", "February 2025"
+  isActive: boolean("is_active").default(false),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Monthly leaderboard points tracking
+export const monthlyPoints = pgTable("monthly_points", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  seasonId: varchar("season_id").references(() => seasons.id).notNull(),
+  points: integer("points").default(0),
+  rank: integer("rank"),
+  suburb: varchar("suburb").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // QR code scans for tracking vending machine interactions
 export const qrScans = pgTable("qr_scans", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -162,6 +186,7 @@ export const promotions = pgTable("promotions", {
 export const usersRelations = relations(users, ({ many }) => ({
   transactions: many(transactions),
   notifications: many(notifications),
+  monthlyPoints: many(monthlyPoints),
   qrScans: many(qrScans),
 }));
 
@@ -197,6 +222,21 @@ export const qrScansRelations = relations(qrScans, ({ one }) => ({
   }),
 }));
 
+export const seasonsRelations = relations(seasons, ({ many }) => ({
+  monthlyPoints: many(monthlyPoints),
+}));
+
+export const monthlyPointsRelations = relations(monthlyPoints, ({ one }) => ({
+  user: one(users, {
+    fields: [monthlyPoints.userId],
+    references: [users.id],
+  }),
+  season: one(seasons, {
+    fields: [monthlyPoints.seasonId],
+    references: [seasons.id],
+  }),
+}));
+
 export const promotionsRelations = relations(promotions, ({ many }) => ({
   // Relations can be added as needed
 }));
@@ -204,6 +244,24 @@ export const promotionsRelations = relations(promotions, ({ many }) => ({
 // Schema types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
+export type Transaction = typeof transactions.$inferSelect;
+export type InsertTransaction = typeof transactions.$inferInsert;
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = typeof notifications.$inferInsert;
+export type ExternalTransaction = typeof externalTransactions.$inferSelect;
+export type InsertExternalTransaction = typeof externalTransactions.$inferInsert;
+export type Reward = typeof rewards.$inferSelect;
+export type InsertReward = typeof rewards.$inferInsert;
+export type Machine = typeof machines.$inferSelect;
+export type InsertMachine = typeof machines.$inferInsert;
+export type Season = typeof seasons.$inferSelect;
+export type InsertSeason = typeof seasons.$inferInsert;
+export type MonthlyPoints = typeof monthlyPoints.$inferSelect;
+export type InsertMonthlyPoints = typeof monthlyPoints.$inferInsert;
+export type QRScan = typeof qrScans.$inferSelect;
+export type InsertQRScan = typeof qrScans.$inferInsert;
+export type Promotion = typeof promotions.$inferSelect;
+export type InsertPromotion = typeof promotions.$inferInsert;
 
 export const insertTransactionSchema = createInsertSchema(transactions).pick({
   userId: true,

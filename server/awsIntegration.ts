@@ -28,6 +28,40 @@ interface MomaTransaction {
   transactionId: string;
 }
 
+// Product point values based on requirements
+const PRODUCT_POINT_VALUES = {
+  LARGE_DRINK: 20,
+  SMALL_DRINK: 10,
+  SNACK: 15,
+  DEFAULT: 10 // Fallback for unrecognized products
+};
+
+// Function to determine point value based on product name
+function getProductPointValue(productName: string): number {
+  const product = productName.toLowerCase();
+  
+  // Large drinks
+  if (product.includes('large') || product.includes('600ml') || product.includes('750ml')) {
+    return PRODUCT_POINT_VALUES.LARGE_DRINK;
+  }
+  
+  // Small drinks  
+  if (product.includes('small') || product.includes('250ml') || product.includes('330ml') || 
+      product.includes('can') || product.includes('bottle') || product.includes('water') ||
+      product.includes('coke') || product.includes('pepsi') || product.includes('sprite')) {
+    return PRODUCT_POINT_VALUES.SMALL_DRINK;
+  }
+  
+  // Snacks
+  if (product.includes('chip') || product.includes('chocolate') || product.includes('bar') ||
+      product.includes('snack') || product.includes('biscuit') || product.includes('cookie') ||
+      product.includes('nuts') || product.includes('crackers')) {
+    return PRODUCT_POINT_VALUES.SNACK;
+  }
+  
+  return PRODUCT_POINT_VALUES.DEFAULT;
+}
+
 export class AWSMomaSync {
   private bucketName: string;
   private queueUrl: string;
@@ -211,21 +245,24 @@ export class AWSMomaSync {
   // Process individual transaction
   private async processTransaction(transactionData: MomaTransaction): Promise<void> {
     try {
-      // Convert to external transaction format
+      // Calculate product-specific points
+      const pointsEarned = getProductPointValue(transactionData.product);
+      
+      // Convert to external transaction format with product-specific points
       const externalTransaction = {
         externalId: transactionData.transactionId,
-        date: new Date(transactionData.date),
-        amount: transactionData.amount,
+        machineId: transactionData.machineId || "unknown",
         cardNumber: transactionData.cardNumber,
-        product: transactionData.product,
-        machineId: transactionData.machineId,
-        source: "aws-moma",
+        amount: transactionData.amount,
+        productName: transactionData.product,
+        timestamp: new Date(transactionData.date),
+        pointsEarned, // Add calculated points based on product type
       };
 
       // Process through existing external transaction system
-      await storage.processExternalTransaction(externalTransaction);
+      await storage.processExternalTransactionWithPoints(externalTransaction);
       
-      console.log(`Processed transaction: ${transactionData.transactionId}`);
+      console.log(`Processed transaction: ${transactionData.transactionId} - ${transactionData.product} (${pointsEarned} points)`);
     } catch (error) {
       console.error(`Error processing transaction ${transactionData.transactionId}:`, error);
     }
