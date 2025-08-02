@@ -95,7 +95,7 @@ export class DatabaseStorage implements IStorage {
       ...userData,
       referralCode: this.generateShortCode(),
       // Check if this is the developer account
-      isDeveloper: userData.email?.toLowerCase() === 'byronjones05@icloud.com',
+      isDeveloper: userData.email?.toLowerCase() === 'byron@sydneyselectvending.com.au',
     };
 
     const [user] = await db

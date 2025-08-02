@@ -144,7 +144,7 @@ The system now supports fully automated point updates without user interaction, 
 
 ### Developer Access Control (January 2025)
 - **Restricted Developer Page**: Added exclusive developer console accessible only to accounts with `isDeveloper` flag
-- **Email-Based Access**: Developer status automatically assigned to `byronjones05@icloud.com` during signup
+- **Email-Based Access**: Developer status automatically assigned to `byron@sydneyselectvending.com.au` during signup
 - **Advanced System Controls**: Developer console includes database operations, user analytics, and system diagnostics
 - **Security Separation**: Developer access is separate from admin access, providing higher-level system controls
 
