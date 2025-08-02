@@ -18,6 +18,7 @@ import Signup from "@/pages/signup";
 import Login from "@/pages/login";
 import ForgotPassword from "@/pages/forgot-password";
 import ResetPassword from "@/pages/reset-password";
+import Developer from "@/pages/developer";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -44,6 +45,7 @@ function Router() {
           <Route path="/rewards" component={Rewards} />
           <Route path="/profile" component={Profile} />
           <Route path="/admin" component={Admin} />
+          <Route path="/developer" component={Developer} />
         </>
       )}
       <Route component={NotFound} />

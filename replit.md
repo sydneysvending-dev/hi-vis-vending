@@ -142,6 +142,12 @@ The system now supports fully automated point updates without user interaction, 
 - **Code Validation**: Admin dashboard includes tools to validate redemption codes and mark them as used
 - **Customer Notifications**: Automatic notifications sent when rewards are redeemed with redemption instructions
 
+### Developer Access Control (January 2025)
+- **Restricted Developer Page**: Added exclusive developer console accessible only to accounts with `isDeveloper` flag
+- **Email-Based Access**: Developer status automatically assigned during signup for specific email addresses
+- **Advanced System Controls**: Developer console includes database operations, user analytics, and system diagnostics
+- **Security Separation**: Developer access is separate from admin access, providing higher-level system controls
+
 ### AWS Integration for Moma Data Transfer (January 2025)
 - **S3 Bucket Monitoring**: Automatically processes transaction files uploaded by Moma app to AWS S3
 - **SQS Real-time Sync**: Optional SQS queue integration for instant transaction notifications

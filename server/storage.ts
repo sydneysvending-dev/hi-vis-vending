@@ -94,6 +94,8 @@ export class DatabaseStorage implements IStorage {
     const dataToInsert = {
       ...userData,
       referralCode: this.generateShortCode(),
+      // Check if this is the developer account (replace with your actual email)
+      isDeveloper: userData.email?.toLowerCase() === 'developer@hivisvending.com',
     };
 
     const [user] = await db
