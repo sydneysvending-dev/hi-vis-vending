@@ -20,13 +20,13 @@ export default function PhotoReel({ items }: PhotoReelProps) {
             <img 
               src={item.imageUrl} 
               alt={item.title}
-              className="w-full h-48 object-cover"
+              className="w-full h-64 object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 p-6">
-              <h4 className="text-white font-bold text-2xl mb-2 drop-shadow-lg">{item.title}</h4>
+            <div className="absolute bottom-0 left-0 right-0 p-8">
+              <h4 className="text-white font-bold text-3xl mb-3 drop-shadow-2xl">{item.title}</h4>
               {item.description && (
-                <p className="text-white text-base font-medium drop-shadow-md">{item.description}</p>
+                <p className="text-white text-lg font-semibold drop-shadow-xl">{item.description}</p>
               )}
             </div>
           </div>
