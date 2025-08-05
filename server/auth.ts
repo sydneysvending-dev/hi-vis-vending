@@ -76,12 +76,24 @@ export function setupAuth(app: Express) {
       { usernameField: "email" },
       async (email, password, done) => {
         try {
+          console.log("Login attempt for:", email);
           const user = await storage.getUserByEmail(email);
-          if (!user || !(await comparePasswords(password, user.password))) {
-            return done(null, false);
+          if (!user) {
+            console.log("User not found:", email);
+            return done(null, false, { message: "Invalid email or password" });
           }
+          
+          console.log("User found, checking password...");
+          const isValidPassword = await comparePasswords(password, user.password);
+          if (!isValidPassword) {
+            console.log("Password invalid for user:", email);
+            return done(null, false, { message: "Invalid email or password" });
+          }
+          
+          console.log("Login successful for:", email);
           return done(null, user);
         } catch (error) {
+          console.error("Login error:", error);
           return done(error);
         }
       }
@@ -147,8 +159,27 @@ export function setupAuth(app: Express) {
     }
   });
 
-  app.post("/api/auth/login", passport.authenticate("local"), (req, res) => {
-    res.status(200).json(req.user);
+  app.post("/api/auth/login", (req, res, next) => {
+    console.log("Login request received:", req.body);
+    passport.authenticate("local", (err, user, info) => {
+      if (err) {
+        console.error("Login authentication error:", err);
+        return res.status(500).json({ message: "Authentication error" });
+      }
+      if (!user) {
+        console.log("Login failed - no user:", info);
+        return res.status(401).json({ message: info?.message || "Invalid credentials" });
+      }
+      
+      req.login(user, (loginErr) => {
+        if (loginErr) {
+          console.error("Login session error:", loginErr);
+          return res.status(500).json({ message: "Login session failed" });
+        }
+        console.log("Login successful for user:", user.email);
+        res.status(200).json(user);
+      });
+    })(req, res, next);
   });
 
   app.post("/api/auth/logout", (req, res, next) => {
