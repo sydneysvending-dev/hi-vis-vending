@@ -17,7 +17,7 @@ export default function PhotoReel({ items }: PhotoReelProps) {
             key={item.id} 
             className="min-w-full flex-shrink-0 relative snap-start"
           >
-            <div className="w-full aspect-[16/9] sm:aspect-[21/9] md:aspect-[3/1] overflow-hidden">
+            <div className="w-full aspect-[4/3] sm:aspect-[16/9] md:aspect-[21/9] overflow-hidden">
               <img 
                 src={item.imageUrl} 
                 alt={item.title}
