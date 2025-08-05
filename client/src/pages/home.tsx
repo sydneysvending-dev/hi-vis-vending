@@ -198,35 +198,7 @@ export default function Home() {
           <PunchCard progress={user.punchCardProgress || 0} />
         </section>
 
-        {/* Quick Actions */}
-        <section className="px-6 py-4">
-          <h3 className="text-white text-lg font-semibold mb-4">Quick Actions</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <Link href="/my-code">
-              <Button className="w-full bg-slate-700 hover:bg-slate-600 rounded-xl p-6 h-auto flex-col space-y-3 border border-slate-600">
-                <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
-                  <QrCode className="text-white w-6 h-6" />
-                </div>
-                <div className="text-center">
-                  <p className="font-semibold text-white">My Code</p>
-                  <p className="text-xs text-slate-400 mt-1">Show & earn</p>
-                </div>
-              </Button>
-            </Link>
-            
-            <Link href="/rewards">
-              <Button className="w-full bg-slate-700 hover:bg-slate-600 rounded-xl p-6 h-auto flex-col space-y-3 border border-slate-600">
-                <div className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center">
-                  <Gift className="text-slate-800 w-6 h-6" />
-                </div>
-                <div className="text-center">
-                  <p className="font-semibold text-white">Rewards</p>
-                  <p className="text-xs text-slate-400 mt-1">Redeem now</p>
-                </div>
-              </Button>
-            </Link>
-          </div>
-        </section>
+
 
         {/* Recent Activity */}
         {recentTransactions.length > 0 && (

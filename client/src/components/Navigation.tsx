@@ -23,6 +23,19 @@ export default function Navigation() {
           </button>
         </Link>
         
+        <Link href="/rewards" className="flex-1">
+          <button className="w-full py-3 px-2 text-center">
+            <Gift className={`w-4 h-4 mx-auto mb-1 ${
+              isActive('/rewards') ? 'text-orange-500' : 'text-slate-400'
+            }`} />
+            <span className={`text-xs font-medium ${
+              isActive('/rewards') ? 'text-orange-500' : 'text-slate-400'
+            }`}>
+              Rewards
+            </span>
+          </button>
+        </Link>
+        
         <Link href="/my-code" className="flex-1">
           <button className="w-full py-3 px-2 text-center">
             <QrCode className={`w-4 h-4 mx-auto mb-1 ${
@@ -45,19 +58,6 @@ export default function Navigation() {
               isActive('/leaderboard') ? 'text-orange-500' : 'text-slate-400'
             }`}>
               Leaderboard
-            </span>
-          </button>
-        </Link>
-        
-        <Link href="/rewards" className="flex-1">
-          <button className="w-full py-3 px-2 text-center">
-            <Gift className={`w-4 h-4 mx-auto mb-1 ${
-              isActive('/rewards') ? 'text-orange-500' : 'text-slate-400'
-            }`} />
-            <span className={`text-xs font-medium ${
-              isActive('/rewards') ? 'text-orange-500' : 'text-slate-400'
-            }`}>
-              Rewards
             </span>
           </button>
         </Link>
