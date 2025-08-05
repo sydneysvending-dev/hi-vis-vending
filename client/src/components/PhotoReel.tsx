@@ -22,11 +22,11 @@ export default function PhotoReel({ items }: PhotoReelProps) {
               alt={item.title}
               className="w-full h-48 object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-6">
-              <h4 className="text-white font-bold text-xl mb-2">{item.title}</h4>
+              <h4 className="text-white font-bold text-2xl mb-2 drop-shadow-lg">{item.title}</h4>
               {item.description && (
-                <p className="text-white/90 text-sm">{item.description}</p>
+                <p className="text-white text-base font-medium drop-shadow-md">{item.description}</p>
               )}
             </div>
           </div>

@@ -61,8 +61,8 @@ export default function AppExclusiveRewards({ rewards, onRedeem }: AppExclusiveR
                 <div className="flex-1">
                   <div className="flex items-start justify-between mb-2">
                     <div>
-                      <h4 className="text-white font-semibold text-sm">{reward.title}</h4>
-                      <p className="text-slate-300 text-xs">{reward.description}</p>
+                      <h4 className="text-white font-bold text-base">{reward.title}</h4>
+                      <p className="text-slate-100 text-sm font-medium">{reward.description}</p>
                     </div>
                     {reward.isLimitedTime && reward.expiresAt && (
                       <Badge variant="outline" className="border-red-400 text-red-400 text-xs">
@@ -74,7 +74,7 @@ export default function AppExclusiveRewards({ rewards, onRedeem }: AppExclusiveR
 
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="text-yellow-400 font-bold text-sm">
+                      <div className="text-yellow-300 font-bold text-base">
                         {reward.pointsCost} points
                       </div>
                       {reward.originalPrice && (
