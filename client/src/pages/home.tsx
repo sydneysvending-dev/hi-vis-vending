@@ -35,9 +35,10 @@ export default function Home() {
   });
 
   const { data: photoReelItems } = useQuery<PhotoReelItem[]>({
-    queryKey: ["/api/content/photo-reel"],
+    queryKey: ["/api/content/photo-reel", Date.now()], // Force fresh data
     enabled: isAuthenticated,
-    staleTime: 0, // Force refresh
+    staleTime: 0,
+    cacheTime: 0,
   });
 
   const { data: appExclusiveRewards } = useQuery<AppExclusiveReward[]>({
