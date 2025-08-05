@@ -7,6 +7,7 @@ import { apiRequest } from "@/lib/queryClient";
 import Navigation from "@/components/Navigation";
 import LoyaltyProgress from "@/components/LoyaltyProgress";
 import PunchCard from "@/components/PunchCard";
+import DailyStreakTracker from "@/components/DailyStreakTracker";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -217,6 +218,14 @@ export default function Home() {
         {/* Punch Card */}
         <section className="px-6 py-4">
           <PunchCard progress={user.punchCardProgress || 0} />
+        </section>
+
+        {/* Daily Streak Tracker */}
+        <section className="px-6 py-4">
+          <DailyStreakTracker 
+            currentStreak={user.currentStreak || 0}
+            streakRewardEarned={user.streakRewardEarned || false}
+          />
         </section>
 
         {/* Recent Activity */}

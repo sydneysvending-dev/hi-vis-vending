@@ -272,7 +272,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         machineId,
       });
 
-      // Update user points and punch card
+      // Update user points, punch card, and daily streak
       const user = await storage.getUser(userId);
       if (user) {
         const newPoints = (user.totalPoints || 0) + 10;
@@ -280,6 +280,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         await storage.updateUserPoints(userId, newPoints);
         await storage.updatePunchCard(userId, newPunchProgress);
+        await storage.updateDailyStreak(userId);
         
         // Check for punch card completion
         if (newPunchProgress === 10) {

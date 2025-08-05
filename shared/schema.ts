@@ -49,6 +49,10 @@ export const users = pgTable("users", {
   phoneNumber: varchar("phone_number"), // Alternative matching method
   // Location information
   suburb: varchar("suburb").notNull(), // Mandatory field for grouping customers by construction sites
+  // Daily streak tracking
+  currentStreak: integer("current_streak").default(0),
+  lastPurchaseDate: timestamp("last_purchase_date"),
+  streakRewardEarned: boolean("streak_reward_earned").default(false), // Has earned 3-day reward
   // Password reset functionality
   resetToken: varchar("reset_token"),
   resetTokenExpiry: timestamp("reset_token_expiry"),

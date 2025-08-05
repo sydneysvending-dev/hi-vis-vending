@@ -74,14 +74,7 @@ export default function Leaderboard() {
       </header>
 
       <main className="p-6 pb-20">
-        {/* Hero Section */}
-        <div className="gradient-orange rounded-2xl p-6 text-slate-800 mb-6">
-          <div className="text-center">
-            <Trophy className="w-16 h-16 mx-auto mb-3" />
-            <h2 className="text-2xl font-bold mb-2">Top Performers</h2>
-            <p className="text-lg opacity-90">See how you rank against other workers</p>
-          </div>
-        </div>
+
 
         {/* Monthly Prizes Section */}
         <Card className="bg-gradient-to-r from-yellow-500 to-orange-500 border-0 mb-6">
