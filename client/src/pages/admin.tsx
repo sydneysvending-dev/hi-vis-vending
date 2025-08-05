@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { HardHat, Users, Activity, Gift, Bell, Link2, DollarSign, Target, Clock, ArrowLeft, Send, Play, Square, Wifi, WifiOff, Upload, CheckCircle } from "lucide-react";
 import { Link } from "wouter";
+import { capitalizeName } from "@/lib/utils";
 
 export default function Admin() {
   const { toast } = useToast();
@@ -548,7 +549,7 @@ export default function Admin() {
                         <div className="flex justify-between items-center">
                           <div>
                             <p className="font-semibold text-white">
-                              {user.firstName} {user.lastName}
+                              {capitalizeName(user.firstName)} {capitalizeName(user.lastName)}
                             </p>
                             <p className="text-slate-400 text-sm">{user.email}</p>
                             <p className="text-yellow-400 text-sm">

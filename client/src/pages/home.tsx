@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { QrCode, Gift, HardHat, Bell, Users, Copy, Share2 } from "lucide-react";
 import { Link } from "wouter";
+import { capitalizeName } from "@/lib/utils";
 
 export default function Home() {
   const [referralCodeInput, setReferralCodeInput] = useState("");
@@ -169,7 +170,7 @@ export default function Home() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-2xl font-bold">
-                {user.firstName ? `${user.firstName} ${user.lastName || ''}` : 'Welcome'}
+                {user.firstName ? `${capitalizeName(user.firstName)} ${capitalizeName(user.lastName || '')}` : 'Welcome'}
               </h2>
               <p className="text-lg opacity-90">Welcome back, {getTierName(user.loyaltyTier || 'apprentice')}!</p>
             </div>

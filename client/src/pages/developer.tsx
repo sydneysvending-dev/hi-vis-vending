@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { User } from "@shared/schema";
+import { capitalizeName } from "@/lib/utils";
 
 type AdminStats = {
   totalUsers: number;
@@ -95,7 +96,7 @@ export default function Developer() {
       users: allUsers.map(user => ({
         id: user.id,
         email: user.email,
-        name: `${user.firstName} ${user.lastName || ''}`.trim(),
+        name: `${capitalizeName(user.firstName || '')} ${capitalizeName(user.lastName || '')}`.trim(),
         suburb: user.suburb,
         tier: user.loyaltyTier,
         points: user.totalPoints,
@@ -132,7 +133,7 @@ export default function Developer() {
             <Badge variant="destructive" className="bg-red-500">RESTRICTED</Badge>
           </div>
           <p className="text-gray-600">
-            Advanced system controls and diagnostics for {user.firstName} {user.lastName}
+            Advanced system controls and diagnostics for {capitalizeName(user.firstName || '')} {capitalizeName(user.lastName || '')}
           </p>
         </div>
 

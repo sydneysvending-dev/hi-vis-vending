@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { HardHat, LogOut, History, Star, Trophy, Code, ExternalLink } from "lucide-react";
 import { useLocation, Link } from "wouter";
 import { User, Transaction } from "@shared/schema";
+import { capitalizeName } from "@/lib/utils";
 
 export default function Profile() {
   const { user } = useAuth() as { user: User | null };
@@ -88,7 +89,7 @@ export default function Profile() {
             </div>
             <div>
               <h2 className="text-2xl font-bold">
-                {user.firstName ? `${user.firstName} ${user.lastName || ''}` : 'User'}
+                {user.firstName ? `${capitalizeName(user.firstName)} ${capitalizeName(user.lastName || '')}` : 'User'}
               </h2>
               <div className="flex items-center space-x-2">
                 <div className={`w-6 h-6 ${getTierColor(user.loyaltyTier || 'apprentice')} rounded-full flex items-center justify-center`}>

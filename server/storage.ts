@@ -100,6 +100,8 @@ export class DatabaseStorage implements IStorage {
   async createUser(userData: Omit<UpsertUser, 'id'>): Promise<User> {
     const dataToInsert = {
       ...userData,
+      firstName: userData.firstName ? this.capitalizeName(userData.firstName) : userData.firstName,
+      lastName: userData.lastName ? this.capitalizeName(userData.lastName) : userData.lastName,
       referralCode: this.generateShortCode(),
       // Check if this is the developer account
       isDeveloper: userData.email?.toLowerCase() === 'byron@sydneyselectvending.com.au',
@@ -117,7 +119,16 @@ export class DatabaseStorage implements IStorage {
     const existingUser = await this.getUser(userData.id!);
     const dataToInsert = {
       ...userData,
+      firstName: userData.firstName ? this.capitalizeName(userData.firstName) : userData.firstName,
+      lastName: userData.lastName ? this.capitalizeName(userData.lastName) : userData.lastName,
       referralCode: existingUser?.referralCode || this.generateShortCode(),
+    };
+
+    const updateData = {
+      ...userData,
+      firstName: userData.firstName ? this.capitalizeName(userData.firstName) : userData.firstName,
+      lastName: userData.lastName ? this.capitalizeName(userData.lastName) : userData.lastName,
+      updatedAt: new Date(),
     };
 
     const [user] = await db
@@ -125,10 +136,7 @@ export class DatabaseStorage implements IStorage {
       .values(dataToInsert)
       .onConflictDoUpdate({
         target: users.id,
-        set: {
-          ...userData,
-          updatedAt: new Date(),
-        },
+        set: updateData,
       })
       .returning();
     return user;
@@ -197,6 +205,14 @@ export class DatabaseStorage implements IStorage {
       result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return result;
+  }
+
+  private capitalizeName(name: string): string {
+    if (!name || !name.trim()) return name;
+    return name.trim()
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
   }
 
   // Loyalty operations
@@ -311,8 +327,8 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db
       .update(users)
       .set({ 
-        firstName: profile.firstName,
-        lastName: profile.lastName,
+        firstName: this.capitalizeName(profile.firstName),
+        lastName: this.capitalizeName(profile.lastName),
         suburb: profile.suburb,
         updatedAt: new Date()
       })

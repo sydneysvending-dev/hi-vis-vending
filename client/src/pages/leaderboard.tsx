@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import Navigation from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { HardHat, Trophy, Medal, Award, MapPin } from "lucide-react";
+import { capitalizeName } from "@/lib/utils";
 
 type LeaderboardUser = {
   id: string;
@@ -163,7 +164,7 @@ export default function Leaderboard() {
                         </div>
                         <div>
                           <p className={`font-semibold ${player.id === user.id ? 'text-blue-400' : 'text-white'}`}>
-                            {player.firstName} {player.lastName}
+                            {capitalizeName(player.firstName)} {capitalizeName(player.lastName)}
                             {player.id === user.id && ' (You)'}
                           </p>
                           <p className={`text-sm ${getTierColor(player.loyaltyTier)}`}>
