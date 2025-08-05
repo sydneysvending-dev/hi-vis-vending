@@ -822,6 +822,118 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Content management routes
+  app.get("/api/content/photo-reel", async (req, res) => {
+    try {
+      const items = await storage.getPhotoReelItems();
+      res.json(items);
+    } catch (error) {
+      console.error("Error fetching photo reel items:", error);
+      res.status(500).json({ message: "Failed to fetch photo reel items" });
+    }
+  });
+
+  app.get("/api/content/app-exclusive-rewards", async (req, res) => {
+    try {
+      const rewards = await storage.getAppExclusiveRewards();
+      res.json(rewards);
+    } catch (error) {
+      console.error("Error fetching app exclusive rewards:", error);
+      res.status(500).json({ message: "Failed to fetch app exclusive rewards" });
+    }
+  });
+
+  // Developer content management routes
+  app.post("/api/developer/photo-reel", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user.id);
+      if (!user?.isDeveloper) {
+        return res.status(403).json({ message: "Developer access required" });
+      }
+
+      const item = await storage.createPhotoReelItem(req.body);
+      res.json(item);
+    } catch (error) {
+      console.error("Error creating photo reel item:", error);
+      res.status(500).json({ message: "Failed to create photo reel item" });
+    }
+  });
+
+  app.put("/api/developer/photo-reel/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user.id);
+      if (!user?.isDeveloper) {
+        return res.status(403).json({ message: "Developer access required" });
+      }
+
+      const item = await storage.updatePhotoReelItem(req.params.id, req.body);
+      res.json(item);
+    } catch (error) {
+      console.error("Error updating photo reel item:", error);
+      res.status(500).json({ message: "Failed to update photo reel item" });
+    }
+  });
+
+  app.delete("/api/developer/photo-reel/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user.id);
+      if (!user?.isDeveloper) {
+        return res.status(403).json({ message: "Developer access required" });
+      }
+
+      await storage.deletePhotoReelItem(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting photo reel item:", error);
+      res.status(500).json({ message: "Failed to delete photo reel item" });
+    }
+  });
+
+  app.post("/api/developer/app-exclusive-rewards", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user.id);
+      if (!user?.isDeveloper) {
+        return res.status(403).json({ message: "Developer access required" });
+      }
+
+      const reward = await storage.createAppExclusiveReward(req.body);
+      res.json(reward);
+    } catch (error) {
+      console.error("Error creating app exclusive reward:", error);
+      res.status(500).json({ message: "Failed to create app exclusive reward" });
+    }
+  });
+
+  app.put("/api/developer/app-exclusive-rewards/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user.id);
+      if (!user?.isDeveloper) {
+        return res.status(403).json({ message: "Developer access required" });
+      }
+
+      const reward = await storage.updateAppExclusiveReward(req.params.id, req.body);
+      res.json(reward);
+    } catch (error) {
+      console.error("Error updating app exclusive reward:", error);
+      res.status(500).json({ message: "Failed to update app exclusive reward" });
+    }
+  });
+
+  app.delete("/api/developer/app-exclusive-rewards/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user.id);
+      if (!user?.isDeveloper) {
+        return res.status(403).json({ message: "Developer access required" });
+      }
+
+      await storage.deleteAppExclusiveReward(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting app exclusive reward:", error);
+      res.status(500).json({ message: "Failed to delete app exclusive reward" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

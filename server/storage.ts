@@ -7,6 +7,8 @@ import {
   externalTransactions,
   seasons,
   monthlyPoints,
+  photoReelItems,
+  appExclusiveRewards,
   type User,
   type UpsertUser,
   type InsertTransaction,
@@ -19,6 +21,10 @@ import {
   type InsertExternalTransaction,
   type Season,
   type MonthlyPoints,
+  type PhotoReelItem,
+  type InsertPhotoReelItem,
+  type AppExclusiveReward,
+  type InsertAppExclusiveReward,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
@@ -77,6 +83,16 @@ export interface IStorage {
   
   // External transaction matching
   processExternalTransaction(transaction: InsertExternalTransaction): Promise<void>;
+  
+  // Content management operations
+  getPhotoReelItems(): Promise<PhotoReelItem[]>;
+  getAppExclusiveRewards(): Promise<AppExclusiveReward[]>;
+  createPhotoReelItem(item: InsertPhotoReelItem): Promise<PhotoReelItem>;
+  updatePhotoReelItem(id: string, item: Partial<InsertPhotoReelItem>): Promise<PhotoReelItem>;
+  deletePhotoReelItem(id: string): Promise<void>;
+  createAppExclusiveReward(reward: InsertAppExclusiveReward): Promise<AppExclusiveReward>;
+  updateAppExclusiveReward(id: string, reward: Partial<InsertAppExclusiveReward>): Promise<AppExclusiveReward>;
+  deleteAppExclusiveReward(id: string): Promise<void>;
   
   // Leaderboard operations
   getLeaderboardBySuburb(): Promise<{ suburb: string; users: Array<User & { rank: number }> }[]>;
@@ -282,8 +298,8 @@ export class DatabaseStorage implements IStorage {
       newStreak = 1;
     }
 
-    // Check if user earned 3-day streak reward
-    if (newStreak >= 3 && !streakRewardEarned) {
+    // Check if user earned 7-day streak reward
+    if (newStreak >= 7 && !streakRewardEarned) {
       streakRewardEarned = true;
       
       // Create a reward transaction for free large drink
@@ -291,7 +307,7 @@ export class DatabaseStorage implements IStorage {
         userId,
         type: "bonus",
         points: 0, // Free drink, no points deducted
-        description: "3-Day Streak Reward: Free Large Drink",
+        description: "7-Day Streak Reward: Free Large Drink",
         redemptionCode: `STREAK-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
         isRedeemed: false
       });
@@ -932,6 +948,77 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(users, eq(monthlyPoints.userId, users.id))
       .where(eq(monthlyPoints.seasonId, seasonId))
       .orderBy(monthlyPoints.rank);
+  }
+
+  // Content management operations
+  async getPhotoReelItems(): Promise<PhotoReelItem[]> {
+    return await db
+      .select()
+      .from(photoReelItems)
+      .where(eq(photoReelItems.isActive, true))
+      .orderBy(photoReelItems.displayOrder, photoReelItems.createdAt);
+  }
+
+  async getAppExclusiveRewards(): Promise<AppExclusiveReward[]> {
+    return await db
+      .select()
+      .from(appExclusiveRewards)
+      .where(eq(appExclusiveRewards.isActive, true))
+      .orderBy(appExclusiveRewards.displayOrder, appExclusiveRewards.createdAt);
+  }
+
+  async createPhotoReelItem(item: InsertPhotoReelItem): Promise<PhotoReelItem> {
+    const [created] = await db
+      .insert(photoReelItems)
+      .values({
+        ...item,
+        updatedAt: new Date(),
+      })
+      .returning();
+    return created;
+  }
+
+  async updatePhotoReelItem(id: string, item: Partial<InsertPhotoReelItem>): Promise<PhotoReelItem> {
+    const [updated] = await db
+      .update(photoReelItems)
+      .set({
+        ...item,
+        updatedAt: new Date(),
+      })
+      .where(eq(photoReelItems.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deletePhotoReelItem(id: string): Promise<void> {
+    await db.delete(photoReelItems).where(eq(photoReelItems.id, id));
+  }
+
+  async createAppExclusiveReward(reward: InsertAppExclusiveReward): Promise<AppExclusiveReward> {
+    const [created] = await db
+      .insert(appExclusiveRewards)
+      .values({
+        ...reward,
+        updatedAt: new Date(),
+      })
+      .returning();
+    return created;
+  }
+
+  async updateAppExclusiveReward(id: string, reward: Partial<InsertAppExclusiveReward>): Promise<AppExclusiveReward> {
+    const [updated] = await db
+      .update(appExclusiveRewards)
+      .set({
+        ...reward,
+        updatedAt: new Date(),
+      })
+      .where(eq(appExclusiveRewards.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteAppExclusiveReward(id: string): Promise<void> {
+    await db.delete(appExclusiveRewards).where(eq(appExclusiveRewards.id, id));
   }
 }
 

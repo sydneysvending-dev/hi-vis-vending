@@ -8,12 +8,15 @@ import Navigation from "@/components/Navigation";
 import LoyaltyProgress from "@/components/LoyaltyProgress";
 import PunchCard from "@/components/PunchCard";
 import DailyStreakTracker from "@/components/DailyStreakTracker";
+import PhotoReel from "@/components/PhotoReel";
+import AppExclusiveRewards from "@/components/AppExclusiveRewards";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { QrCode, Gift, HardHat, Bell, Users, Copy, Share2 } from "lucide-react";
 import { Link } from "wouter";
 import { capitalizeName } from "@/lib/utils";
+import { PhotoReelItem, AppExclusiveReward } from "@shared/schema";
 
 export default function Home() {
   const [referralCodeInput, setReferralCodeInput] = useState("");
@@ -28,6 +31,16 @@ export default function Home() {
 
   const { data: myReferralData } = useQuery({
     queryKey: ["/api/referral/my-code"],
+    enabled: isAuthenticated,
+  });
+
+  const { data: photoReelItems } = useQuery<PhotoReelItem[]>({
+    queryKey: ["/api/content/photo-reel"],
+    enabled: isAuthenticated,
+  });
+
+  const { data: appExclusiveRewards } = useQuery<AppExclusiveReward[]>({
+    queryKey: ["/api/content/app-exclusive-rewards"],
     enabled: isAuthenticated,
   });
 
@@ -185,6 +198,25 @@ export default function Home() {
             points={user.totalPoints || 0}
           />
         </section>
+
+        {/* Photo Reel Section */}
+        {photoReelItems && photoReelItems.length > 0 && (
+          <PhotoReel items={photoReelItems} />
+        )}
+
+        {/* App Exclusive Rewards Section */}
+        {appExclusiveRewards && appExclusiveRewards.length > 0 && (
+          <AppExclusiveRewards 
+            rewards={appExclusiveRewards} 
+            onRedeem={(rewardId) => {
+              // Handle reward redemption
+              toast({
+                title: "Reward Redemption",
+                description: "Coming soon! Visit the rewards tab to redeem.",
+              });
+            }}
+          />
+        )}
 
         {/* Daily Streak Tracker */}
         <section className="px-6 py-6">

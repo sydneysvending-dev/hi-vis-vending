@@ -52,7 +52,7 @@ export const users = pgTable("users", {
   // Daily streak tracking
   currentStreak: integer("current_streak").default(0),
   lastPurchaseDate: timestamp("last_purchase_date"),
-  streakRewardEarned: boolean("streak_reward_earned").default(false), // Has earned 3-day reward
+  streakRewardEarned: boolean("streak_reward_earned").default(false), // Has earned 7-day reward
   // Password reset functionality
   resetToken: varchar("reset_token"),
   resetTokenExpiry: timestamp("reset_token_expiry"),
@@ -116,6 +116,36 @@ export const rewards = pgTable("rewards", {
   category: varchar("category").notNull(), // drink, snack, bonus
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Photo reel for home page
+export const photoReelItems = pgTable("photo_reel_items", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: varchar("title").notNull(),
+  description: text("description"),
+  imageUrl: varchar("image_url").notNull(),
+  linkUrl: varchar("link_url"), // Optional link for CTA
+  isActive: boolean("is_active").default(true),
+  displayOrder: integer("display_order").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// App exclusive rewards section
+export const appExclusiveRewards = pgTable("app_exclusive_rewards", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: varchar("title").notNull(),
+  description: text("description").notNull(),
+  pointsCost: integer("points_cost").notNull(),
+  originalPrice: varchar("original_price"), // e.g., "$4.50"
+  savingsText: varchar("savings_text"), // e.g., "Save $2.50"
+  imageUrl: varchar("image_url"),
+  isActive: boolean("is_active").default(true),
+  isLimitedTime: boolean("is_limited_time").default(false),
+  expiresAt: timestamp("expires_at"),
+  displayOrder: integer("display_order").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // Vending machines table
@@ -266,6 +296,10 @@ export type QRScan = typeof qrScans.$inferSelect;
 export type InsertQRScan = typeof qrScans.$inferInsert;
 export type Promotion = typeof promotions.$inferSelect;
 export type InsertPromotion = typeof promotions.$inferInsert;
+export type PhotoReelItem = typeof photoReelItems.$inferSelect;
+export type InsertPhotoReelItem = typeof photoReelItems.$inferInsert;
+export type AppExclusiveReward = typeof appExclusiveRewards.$inferSelect;
+export type InsertAppExclusiveReward = typeof appExclusiveRewards.$inferInsert;
 
 export const insertTransactionSchema = createInsertSchema(transactions).pick({
   userId: true,
@@ -312,6 +346,26 @@ export const insertQRScanSchema = createInsertSchema(qrScans).pick({
   pointsAwarded: true,
   discountApplied: true,
   nayaxTransactionId: true,
+});
+
+export const insertPhotoReelItemSchema = createInsertSchema(photoReelItems).pick({
+  title: true,
+  description: true,
+  imageUrl: true,
+  linkUrl: true,
+  displayOrder: true,
+});
+
+export const insertAppExclusiveRewardSchema = createInsertSchema(appExclusiveRewards).pick({
+  title: true,
+  description: true,
+  pointsCost: true,
+  originalPrice: true,
+  savingsText: true,
+  imageUrl: true,
+  isLimitedTime: true,
+  expiresAt: true,
+  displayOrder: true,
 });
 
 export const insertPromotionSchema = createInsertSchema(promotions).pick({

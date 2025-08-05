@@ -8,7 +8,7 @@ interface DailyStreakTrackerProps {
 }
 
 export default function DailyStreakTracker({ currentStreak, streakRewardEarned }: DailyStreakTrackerProps) {
-  const targetStreak = 3;
+  const targetStreak = 7;
   const streakDays = Array.from({ length: targetStreak }, (_, i) => i + 1);
 
   const getStreakIcon = (day: number) => {

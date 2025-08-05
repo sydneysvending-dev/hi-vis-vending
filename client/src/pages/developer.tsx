@@ -56,6 +56,7 @@ export default function Developer() {
     { id: "overview", label: "Overview", icon: Activity },
     { id: "database", label: "Database", icon: Database },
     { id: "users", label: "Users", icon: Users },
+    { id: "content", label: "Content", icon: Code2 },
     { id: "system", label: "System", icon: Settings },
   ];
 
@@ -300,6 +301,62 @@ export default function Developer() {
                 </div>
               </CardContent>
             </Card>
+          )}
+
+          {activeTab === "content" && (
+            <div className="space-y-6">
+              <Card className="border-orange-200">
+                <CardHeader>
+                  <CardTitle className="text-xl text-gray-900">Photo Reel Management</CardTitle>
+                  <p className="text-gray-600">Manage home page photo reel content</p>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                    <h4 className="font-semibold text-yellow-800 mb-2">📸 Photo Reel</h4>
+                    <p className="text-yellow-700 text-sm mb-3">
+                      Manage image carousel content that appears on the home page under the welcome header.
+                    </p>
+                    <div className="space-y-2">
+                      <Button
+                        onClick={() => toast({
+                          title: "Feature Coming Soon",
+                          description: "Photo reel management interface will be available in the next update.",
+                        })}
+                        className="w-full bg-yellow-600 hover:bg-yellow-700"
+                      >
+                        Manage Photo Reel
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-orange-200">
+                <CardHeader>
+                  <CardTitle className="text-xl text-gray-900">App Exclusive Rewards</CardTitle>
+                  <p className="text-gray-600">Manage special app-only reward offers</p>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <h4 className="font-semibold text-yellow-800 mb-2">⭐ Exclusive Rewards</h4>
+                    <p className="text-yellow-700 text-sm mb-3">
+                      Create and manage special rewards that are only available through the mobile app.
+                    </p>
+                    <div className="space-y-2">
+                      <Button
+                        onClick={() => toast({
+                          title: "Feature Coming Soon",
+                          description: "App exclusive rewards management will be available in the next update.",
+                        })}
+                        className="w-full bg-yellow-600 hover:bg-yellow-700"
+                      >
+                        Manage App Exclusive Rewards
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           )}
 
           {activeTab === "system" && (
