@@ -278,76 +278,7 @@ export default function Home() {
           </section>
         )}
 
-        {/* Referral Section */}
-        <section className="px-6 py-6">
-          <h3 className="text-white text-lg font-semibold mb-4 flex items-center">
-            <Users className="w-5 h-5 mr-2" />
-            Referrals
-          </h3>
-          
-          {/* My Referral Code */}
-          <Card className="bg-slate-700 border-slate-600 mb-4">
-            <CardContent className="p-6">
-              <div className="text-center mb-4">
-                <h4 className="text-white font-semibold mb-2">Share Your Code</h4>
-                <p className="text-slate-300 text-sm mb-4">
-                  Invite friends and earn 25 points when they join!
-                </p>
-                <div className="bg-slate-800 rounded-lg p-4 mb-4">
-                  <p className="text-orange-400 text-2xl font-bold tracking-wider">
-                    {myReferralData?.referralCode || 'Loading...'}
-                  </p>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <Button 
-                    onClick={copyReferralCode}
-                    className="bg-orange-600 hover:bg-orange-700 text-white"
-                    disabled={!myReferralData?.referralCode}
-                  >
-                    <Copy className="w-4 h-4 mr-2" />
-                    Copy
-                  </Button>
-                  <Button 
-                    onClick={shareReferralCode}
-                    className="bg-slate-600 hover:bg-slate-500 text-white"
-                    disabled={!myReferralData?.referralCode}
-                  >
-                    <Share2 className="w-4 h-4 mr-2" />
-                    Share
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
 
-          {/* Use Referral Code */}
-          {!user?.hasUsedReferralCode && (
-            <Card className="bg-slate-700 border-slate-600">
-              <CardContent className="p-6">
-                <h4 className="text-white font-semibold mb-2">Have a Referral Code?</h4>
-                <p className="text-slate-300 text-sm mb-4">
-                  Enter a friend's code to get 25 bonus points!
-                </p>
-                <div className="flex gap-3">
-                  <Input
-                    placeholder="Enter code"
-                    value={referralCodeInput}
-                    onChange={(e) => setReferralCodeInput(e.target.value.toUpperCase())}
-                    className="bg-slate-800 border-slate-600 text-white"
-                    maxLength={6}
-                  />
-                  <Button 
-                    onClick={handleUseReferralCode}
-                    disabled={useReferralMutation.isPending || !referralCodeInput.trim()}
-                    className="bg-green-600 hover:bg-green-700 text-white"
-                  >
-                    {useReferralMutation.isPending ? "..." : "Use"}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </section>
       </main>
 
       <Navigation />

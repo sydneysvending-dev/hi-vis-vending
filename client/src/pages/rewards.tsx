@@ -184,6 +184,43 @@ export default function Rewards() {
             </CardContent>
           </Card>
         </section>
+
+        {/* Referral Section */}
+        <section className="mt-8">
+          <h3 className="text-white text-lg font-semibold mb-4 flex items-center">
+            <Gift className="w-5 h-5 mr-2" />
+            Earn More Points
+          </h3>
+          
+          {/* Referral Rewards */}
+          <Card className="bg-slate-700 border-slate-600 mb-4">
+            <CardContent className="p-6">
+              <div className="text-center">
+                <h4 className="text-white font-semibold mb-2">Invite Your Workmates!</h4>
+                <p className="text-slate-300 text-sm mb-4">
+                  Share Hi-Vis Vending with friends and earn bonus points when they sign up.
+                </p>
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="bg-slate-800 rounded-lg p-3">
+                    <p className="text-orange-400 font-bold text-lg">+25</p>
+                    <p className="text-slate-400 text-xs">Points for you</p>
+                  </div>
+                  <div className="bg-slate-800 rounded-lg p-3">
+                    <p className="text-green-400 font-bold text-lg">+25</p>
+                    <p className="text-slate-400 text-xs">Points for them</p>
+                  </div>
+                </div>
+                <Button 
+                  onClick={() => window.location.href = '/referral'}
+                  className="w-full bg-orange-600 hover:bg-orange-700 text-white"
+                >
+                  <Gift className="w-4 h-4 mr-2" />
+                  View My Referral Code
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
       </main>
 
       <Navigation />

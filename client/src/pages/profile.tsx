@@ -84,7 +84,7 @@ export default function Profile() {
           <div className="flex items-center space-x-4 mb-4">
             <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
               <span className="text-2xl font-bold">
-                {user.firstName?.[0] || 'U'}{user.lastName?.[0] || ''}
+                {(user.firstName?.[0] || 'U').toUpperCase()}{(user.lastName?.[0] || '').toUpperCase()}
               </span>
             </div>
             <div>
