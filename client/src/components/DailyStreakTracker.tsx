@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Flame, Calendar, Gift, Star } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Flame, Gift, Star } from "lucide-react";
 
 interface DailyStreakTrackerProps {
   currentStreak: number;
@@ -9,21 +10,7 @@ interface DailyStreakTrackerProps {
 
 export default function DailyStreakTracker({ currentStreak, streakRewardEarned }: DailyStreakTrackerProps) {
   const targetStreak = 7;
-  const streakDays = Array.from({ length: targetStreak }, (_, i) => i + 1);
-
-  const getStreakIcon = (day: number) => {
-    if (day <= currentStreak) {
-      return <Flame className="w-6 h-6 text-orange-500" />;
-    }
-    return <Calendar className="w-6 h-6 text-slate-400" />;
-  };
-
-  const getStreakColor = (day: number) => {
-    if (day <= currentStreak) {
-      return "bg-orange-500/20 border-orange-500";
-    }
-    return "bg-slate-600 border-slate-500";
-  };
+  const progressPercentage = Math.min((currentStreak / targetStreak) * 100, 100);
 
   return (
     <Card className="bg-slate-700 border-slate-600">
@@ -45,16 +32,20 @@ export default function DailyStreakTracker({ currentStreak, streakRewardEarned }
           )}
         </div>
 
-        {/* Streak Progress */}
-        <div className="flex justify-center gap-3 mb-4">
-          {streakDays.map((day) => (
-            <div
-              key={day}
-              className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all ${getStreakColor(day)}`}
-            >
-              {getStreakIcon(day)}
-            </div>
-          ))}
+        {/* Progress Bar */}
+        <div className="space-y-3 mb-4">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-slate-300">Progress</span>
+            <span className="text-orange-400 font-medium">{currentStreak}/{targetStreak} days</span>
+          </div>
+          <Progress 
+            value={progressPercentage} 
+            className="h-3 bg-slate-600"
+          />
+          <div className="flex justify-between text-xs text-slate-400">
+            <span>Start</span>
+            <span>Free Large Drink</span>
+          </div>
         </div>
 
         {/* Progress Description */}
@@ -73,7 +64,7 @@ export default function DailyStreakTracker({ currentStreak, streakRewardEarned }
             </p>
           ) : (
             <p className="text-orange-400 text-sm font-medium">
-              3-day streak complete! Free large drink reward pending.
+              7-day streak complete! Free large drink reward pending.
             </p>
           )}
         </div>
@@ -84,7 +75,7 @@ export default function DailyStreakTracker({ currentStreak, streakRewardEarned }
             <div className="flex items-center gap-2 text-orange-400">
               <Gift className="w-4 h-4" />
               <span className="text-xs font-medium">
-                Purchase on 3 consecutive days to earn a FREE large drink!
+                Purchase on 7 consecutive days to earn a FREE large drink!
               </span>
             </div>
           </div>
