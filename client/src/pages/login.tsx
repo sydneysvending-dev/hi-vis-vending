@@ -33,10 +33,9 @@ export default function Login() {
       setLocation("/");
     },
     onError: (error) => {
-      console.error("Login error:", error);
       toast({
         title: "Login Failed",
-        description: error.message || "Please check your email and password",
+        description: "Invalid email or password",
         variant: "destructive",
       });
     },
