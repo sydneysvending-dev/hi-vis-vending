@@ -185,8 +185,21 @@ export default function Home() {
           />
         </section>
 
-        {/* Quick Actions */}
+        {/* Daily Streak Tracker */}
         <section className="px-6 py-6">
+          <DailyStreakTracker 
+            currentStreak={user.currentStreak || 0}
+            streakRewardEarned={user.streakRewardEarned || false}
+          />
+        </section>
+
+        {/* Punch Card */}
+        <section className="px-6 py-4">
+          <PunchCard progress={user.punchCardProgress || 0} />
+        </section>
+
+        {/* Quick Actions */}
+        <section className="px-6 py-4">
           <h3 className="text-white text-lg font-semibold mb-4">Quick Actions</h3>
           <div className="grid grid-cols-2 gap-4">
             <Link href="/my-code">
@@ -213,19 +226,6 @@ export default function Home() {
               </Button>
             </Link>
           </div>
-        </section>
-
-        {/* Punch Card */}
-        <section className="px-6 py-4">
-          <PunchCard progress={user.punchCardProgress || 0} />
-        </section>
-
-        {/* Daily Streak Tracker */}
-        <section className="px-6 py-4">
-          <DailyStreakTracker 
-            currentStreak={user.currentStreak || 0}
-            streakRewardEarned={user.streakRewardEarned || false}
-          />
         </section>
 
         {/* Recent Activity */}
