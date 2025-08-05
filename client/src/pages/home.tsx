@@ -169,7 +169,7 @@ export default function Home() {
             <Link href="/profile">
               <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center cursor-pointer hover:bg-orange-400 transition-colors">
                 <span className="text-slate-800 font-bold text-sm">
-                  {user.firstName?.[0] || 'U'}{user.lastName?.[0] || ''}
+                  {(user.firstName?.[0] || 'U').toUpperCase()}{(user.lastName?.[0] || '').toUpperCase()}
                 </span>
               </div>
             </Link>
