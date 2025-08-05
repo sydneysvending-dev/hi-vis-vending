@@ -36,10 +36,10 @@ export default function AppExclusiveRewards({ rewards, onRedeem }: AppExclusiveR
       
       <div className="space-y-3">
         {rewards.map((reward) => (
-          <Card key={reward.id} className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-400/30">
+          <Card key={reward.id} className="bg-white border border-slate-200">
             <CardContent className="p-4">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-slate-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div className="w-16 h-16 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
                   {reward.imageUrl ? (
                     <img 
                       src={reward.imageUrl} 
@@ -54,15 +54,15 @@ export default function AppExclusiveRewards({ rewards, onRedeem }: AppExclusiveR
                     />
                   ) : null}
                   <div className={`w-full h-full ${reward.imageUrl ? 'hidden' : 'flex'} items-center justify-center`}>
-                    <Gift className="w-6 h-6 text-yellow-400" />
+                    <Gift className="w-6 h-6 text-orange-500" />
                   </div>
                 </div>
 
                 <div className="flex-1">
                   <div className="flex items-start justify-between mb-2">
                     <div>
-                      <h4 className="text-white font-bold text-base">{reward.title}</h4>
-                      <p className="text-slate-100 text-sm font-medium">{reward.description}</p>
+                      <h4 className="text-slate-800 font-bold text-base">{reward.title}</h4>
+                      <p className="text-slate-600 text-sm font-medium">{reward.description}</p>
                     </div>
                     {reward.isLimitedTime && reward.expiresAt && (
                       <Badge variant="outline" className="border-red-400 text-red-400 text-xs">
@@ -74,16 +74,16 @@ export default function AppExclusiveRewards({ rewards, onRedeem }: AppExclusiveR
 
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="text-yellow-300 font-bold text-base">
+                      <div className="text-orange-600 font-bold text-base">
                         {reward.pointsCost} points
                       </div>
                       {reward.originalPrice && (
                         <div className="flex items-center gap-2">
-                          <span className="text-slate-400 text-xs line-through">
+                          <span className="text-slate-500 text-xs line-through">
                             {reward.originalPrice}
                           </span>
                           {reward.savingsText && (
-                            <span className="text-green-400 text-xs font-semibold">
+                            <span className="text-green-600 text-xs font-semibold">
                               {reward.savingsText}
                             </span>
                           )}
@@ -93,7 +93,7 @@ export default function AppExclusiveRewards({ rewards, onRedeem }: AppExclusiveR
 
                     <Button 
                       size="sm" 
-                      className="bg-yellow-400 hover:bg-yellow-500 text-slate-800 font-semibold"
+                      className="bg-orange-500 hover:bg-orange-600 text-white font-semibold"
                       onClick={() => onRedeem?.(reward.id)}
                     >
                       Redeem Now
