@@ -17,16 +17,18 @@ export default function PhotoReel({ items }: PhotoReelProps) {
             key={item.id} 
             className="min-w-full flex-shrink-0 relative snap-start"
           >
-            <img 
-              src={item.imageUrl} 
-              alt={item.title}
-              className="w-full h-64 object-cover"
-            />
+            <div className="w-full aspect-[16/9] sm:aspect-[21/9] md:aspect-[3/1] overflow-hidden">
+              <img 
+                src={item.imageUrl} 
+                alt={item.title}
+                className="w-full h-full object-cover object-center"
+              />
+            </div>
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 p-8">
-              <h4 className="text-white font-bold text-3xl mb-3 drop-shadow-2xl">{item.title}</h4>
+            <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8">
+              <h4 className="text-white font-bold text-xl sm:text-2xl md:text-3xl mb-2 sm:mb-3 drop-shadow-2xl">{item.title}</h4>
               {item.description && (
-                <p className="text-white text-lg font-semibold drop-shadow-xl">{item.description}</p>
+                <p className="text-white text-sm sm:text-base md:text-lg font-semibold drop-shadow-xl">{item.description}</p>
               )}
             </div>
           </div>

@@ -330,7 +330,10 @@ export default function Developer() {
                       <Upload className="w-8 h-8 text-blue-400 mx-auto mb-2" />
                       <h5 className="font-medium text-blue-800 mb-1">Upload New Image</h5>
                       <p className="text-blue-600 text-xs mb-3">
-                        Drop an image file here or click to browse. Recommended: 1200x400px
+                        <strong>Optimal sizes:</strong><br/>
+                        • Mobile: 1080x607px (16:9 ratio)<br/>
+                        • Desktop: 1200x400px (3:1 ratio)<br/>
+                        • Universal: 1200x533px (21:9 ratio)
                       </p>
                       <input
                         type="file"
