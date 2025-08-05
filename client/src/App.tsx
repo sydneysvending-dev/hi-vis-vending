@@ -19,6 +19,7 @@ import Login from "@/pages/login";
 import ForgotPassword from "@/pages/forgot-password";
 import ResetPassword from "@/pages/reset-password";
 import Developer from "@/pages/developer";
+import TransactionHistory from "@/pages/transaction-history";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -44,6 +45,7 @@ function Router() {
           <Route path="/leaderboard" component={Leaderboard} />
           <Route path="/rewards" component={Rewards} />
           <Route path="/profile" component={Profile} />
+          <Route path="/transaction-history" component={TransactionHistory} />
           <Route path="/admin" component={Admin} />
           <Route path="/developer" component={Developer} />
         </>

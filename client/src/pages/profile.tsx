@@ -4,8 +4,8 @@ import Navigation from "@/components/Navigation";
 import LoyaltyProgress from "@/components/LoyaltyProgress";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { HardHat, LogOut, History, Star, Trophy, Code } from "lucide-react";
-import { useLocation } from "wouter";
+import { HardHat, LogOut, History, Star, Trophy, Code, ExternalLink } from "lucide-react";
+import { useLocation, Link } from "wouter";
 import { User, Transaction } from "@shared/schema";
 
 export default function Profile() {
@@ -123,12 +123,18 @@ export default function Profile() {
               </CardContent>
             </Card>
             
-            <Card className="bg-slate-700 border-slate-600">
-              <CardContent className="p-4 text-center">
-                <p className="text-2xl font-bold text-blue-400">{totalPurchases}</p>
-                <p className="text-slate-300 text-sm">Purchases</p>
-              </CardContent>
-            </Card>
+            <Link href="/transaction-history">
+              <Card className="bg-slate-700 border-slate-600 cursor-pointer hover:bg-slate-600 transition-colors">
+                <CardContent className="p-4 text-center">
+                  <div className="flex items-center justify-center gap-2 mb-1">
+                    <p className="text-2xl font-bold text-blue-400">{totalPurchases}</p>
+                    <ExternalLink className="w-4 h-4 text-slate-400" />
+                  </div>
+                  <p className="text-slate-300 text-sm">Purchases</p>
+                  <p className="text-xs text-slate-400 mt-1">View history</p>
+                </CardContent>
+              </Card>
+            </Link>
             
             <Card className="bg-slate-700 border-slate-600">
               <CardContent className="p-4 text-center">
