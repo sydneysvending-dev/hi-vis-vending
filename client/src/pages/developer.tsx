@@ -3,11 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Code2, Database, Settings, Users, Activity, AlertTriangle, Download, FileText } from "lucide-react";
+import { Code2, Database, Settings, Users, Activity, AlertTriangle, Download, FileText, Camera, Upload, Edit } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { User } from "@shared/schema";
+import { User, PhotoReelItem } from "@shared/schema";
 import { capitalizeName } from "@/lib/utils";
 
 type AdminStats = {
@@ -32,6 +32,11 @@ export default function Developer() {
   // Get all users for developer analysis
   const { data: allUsers } = useQuery<User[]>({
     queryKey: ["/api/admin/users"],
+  });
+
+  // Get photo reel items for content management
+  const { data: photoReelItems } = useQuery<PhotoReelItem[]>({
+    queryKey: ["/api/content/photo-reel"],
   });
 
   if (!user?.isDeveloper) {
@@ -311,21 +316,75 @@ export default function Developer() {
                   <p className="text-gray-600">Manage home page photo reel content</p>
                 </CardHeader>
                 <CardContent>
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-                    <h4 className="font-semibold text-yellow-800 mb-2">📸 Photo Reel</h4>
-                    <p className="text-yellow-700 text-sm mb-3">
-                      Manage image carousel content that appears on the home page under the welcome header.
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                    <h4 className="font-semibold text-blue-800 mb-2 flex items-center gap-2">
+                      <Camera className="w-4 h-4" />
+                      Photo Reel Management
+                    </h4>
+                    <p className="text-blue-700 text-sm mb-4">
+                      Upload and manage promotional images for the home page carousel.
                     </p>
-                    <div className="space-y-2">
-                      <Button
-                        onClick={() => toast({
-                          title: "Feature Coming Soon",
-                          description: "Photo reel management interface will be available in the next update.",
-                        })}
-                        className="w-full bg-yellow-600 hover:bg-yellow-700"
-                      >
-                        Manage Photo Reel
-                      </Button>
+                    
+                    {/* Image Upload Section */}
+                    <div className="bg-white border-2 border-dashed border-blue-300 rounded-lg p-4 mb-4 text-center">
+                      <Upload className="w-8 h-8 text-blue-400 mx-auto mb-2" />
+                      <h5 className="font-medium text-blue-800 mb-1">Upload New Image</h5>
+                      <p className="text-blue-600 text-xs mb-3">
+                        Drop an image file here or click to browse. Recommended: 1200x400px
+                      </p>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            toast({
+                              title: "Image Selected",
+                              description: `${file.name} ready for upload. Image upload functionality will be enhanced in the next update.`,
+                            });
+                          }
+                        }}
+                        className="block w-full text-sm text-blue-600
+                          file:mr-4 file:py-2 file:px-4
+                          file:rounded-full file:border-0
+                          file:text-sm file:font-semibold
+                          file:bg-blue-100 file:text-blue-700
+                          hover:file:bg-blue-200 cursor-pointer"
+                      />
+                    </div>
+
+                    {/* Current Images */}
+                    <div className="space-y-3">
+                      <h5 className="font-medium text-blue-800">Current Photo Reel Images:</h5>
+                      {photoReelItems?.slice(0, 3).map((item, index) => (
+                        <div key={item.id} className="bg-white rounded-lg p-3 border border-blue-200">
+                          <div className="flex items-center gap-3">
+                            <div className="w-16 h-10 bg-blue-100 rounded overflow-hidden">
+                              <img 
+                                src={item.imageUrl} 
+                                alt={item.title}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <div className="flex-1">
+                              <h6 className="font-medium text-blue-900 text-sm">{item.title}</h6>
+                              <p className="text-blue-700 text-xs">{item.description}</p>
+                              <p className="text-blue-500 text-xs">Position: {item.displayOrder + 1}</p>
+                            </div>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="border-blue-300 text-blue-600 hover:bg-blue-50"
+                              onClick={() => toast({
+                                title: "Edit Feature",
+                                description: "Image editing will be available in the next update.",
+                              })}
+                            >
+                              <Edit className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </CardContent>
