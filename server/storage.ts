@@ -382,34 +382,49 @@ export class DatabaseStorage implements IStorage {
     activeUsersToday: number;
     totalPointsEarned: number;
   }> {
-    const totalUsers = await db.select().from(users);
-    const allTransactions = await db.select().from(transactions);
-    const activeMachines = await db.select().from(machines).where(eq(machines.isOnline, true));
-    
-    const pointsRedeemed = allTransactions
-      .filter(t => t.type === "redemption")
-      .reduce((sum, t) => sum + Math.abs(t.points), 0);
+    try {
+      const totalUsers = await db.select().from(users);
+      const allTransactions = await db.select().from(transactions);
+      const allMachines = await db.select().from(machines);
+      
+      const pointsRedeemed = allTransactions
+        .filter(t => t.type === "redemption")
+        .reduce((sum, t) => sum + Math.abs(t.points), 0);
 
-    const totalPointsEarned = allTransactions
-      .filter(t => t.points > 0)
-      .reduce((sum, t) => sum + t.points, 0);
+      const totalPointsEarned = allTransactions
+        .filter(t => t.points > 0)
+        .reduce((sum, t) => sum + t.points, 0);
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const activeUsersToday = allTransactions
-      .filter(t => new Date(t.createdAt!) >= today)
-      .map(t => t.userId)
-      .filter((userId, index, arr) => arr.indexOf(userId) === index)
-      .length;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const activeUsersToday = allTransactions
+        .filter(t => new Date(t.createdAt!) >= today)
+        .map(t => t.userId)
+        .filter((userId, index, arr) => arr.indexOf(userId) === index)
+        .length;
 
-    return {
-      totalUsers: totalUsers.length,
-      totalTransactions: allTransactions.length,
-      pointsRedeemed,
-      activeMachines: activeMachines.length,
-      activeUsersToday,
-      totalPointsEarned,
-    };
+      const activeMachines = allMachines.filter(m => m.isOnline);
+
+      return {
+        totalUsers: totalUsers.length,
+        totalTransactions: allTransactions.length,
+        pointsRedeemed,
+        activeMachines: activeMachines.length,
+        activeUsersToday,
+        totalPointsEarned,
+      };
+    } catch (error) {
+      console.error("Error in getAdminStats:", error);
+      // Return default stats if there's an error
+      return {
+        totalUsers: 0,
+        totalTransactions: 0,
+        pointsRedeemed: 0,
+        activeMachines: 0,
+        activeUsersToday: 0,
+        totalPointsEarned: 0,
+      };
+    }
   }
 
   async getRecentUsers(limit = 10): Promise<User[]> {
