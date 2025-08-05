@@ -330,10 +330,10 @@ export default function Developer() {
                       <Upload className="w-8 h-8 text-blue-400 mx-auto mb-2" />
                       <h5 className="font-medium text-blue-800 mb-1">Upload New Image</h5>
                       <p className="text-blue-600 text-xs mb-3">
-                        <strong>Mobile-optimized sizes:</strong><br/>
-                        • Mobile Primary: 1080x810px (4:3 ratio)<br/>
-                        • Mobile Wide: 1080x607px (16:9 ratio)<br/>
-                        • Your current image: 1080x1350px (portrait) works well!
+                        <strong>Banner dimensions needed:</strong><br/>
+                        • Mobile: 1080x480px (landscape)<br/>
+                        • Desktop: 1200x400px (banner)<br/>
+                        • Your image needs to be converted from portrait to landscape format
                       </p>
                       <input
                         type="file"

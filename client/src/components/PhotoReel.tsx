@@ -17,11 +17,11 @@ export default function PhotoReel({ items }: PhotoReelProps) {
             key={item.id} 
             className="min-w-full flex-shrink-0 relative snap-start"
           >
-            <div className="w-full aspect-[4/3] sm:aspect-[16/9] md:aspect-[21/9] overflow-hidden">
+            <div className="w-full h-48 sm:h-56 md:h-64 overflow-hidden">
               <img 
                 src={item.imageUrl} 
                 alt={item.title}
-                className="w-full h-full object-cover object-center"
+                className="w-full h-full object-cover object-top"
               />
             </div>
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
