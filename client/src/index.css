@@ -4,53 +4,54 @@
 
 :root {
   --background: hsl(0, 0%, 100%);
-  --foreground: hsl(20, 14.3%, 4.1%);
-  --muted: hsl(60, 4.8%, 95.9%);
-  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --foreground: hsl(0, 0%, 11%);
+  --muted: hsl(0, 0%, 96%);
+  --muted-foreground: hsl(0, 0%, 48%);
   --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --popover-foreground: hsl(0, 0%, 11%);
   --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(20, 14.3%, 4.1%);
-  --border: hsl(20, 5.9%, 90%);
-  --input: hsl(20, 5.9%, 90%);
-  --primary: hsl(30, 100%, 50%);
-  --primary-foreground: hsl(20, 14.3%, 4.1%);
-  --secondary: hsl(45, 100%, 60%);
-  --secondary-foreground: hsl(20, 14.3%, 4.1%);
-  --accent: hsl(45, 100%, 60%);
-  --accent-foreground: hsl(20, 14.3%, 4.1%);
+  --card-foreground: hsl(0, 0%, 11%);
+  --border: hsl(0, 0%, 88%);
+  --input: hsl(0, 0%, 92%);
+  --primary: hsl(25, 100%, 50%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(49, 100%, 50%);
+  --secondary-foreground: hsl(0, 0%, 11%);
+  --accent: hsl(49, 100%, 50%);
+  --accent-foreground: hsl(0, 0%, 11%);
   --destructive: hsl(0, 84.2%, 60.2%);
-  --destructive-foreground: hsl(60, 9.1%, 97.8%);
-  --ring: hsl(20, 14.3%, 4.1%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --ring: hsl(25, 100%, 50%);
   --radius: 0.5rem;
   
-  /* Hi-Vis Custom Colors */
-  --hivis-orange: hsl(30, 100%, 50%);
-  --hivis-yellow: hsl(45, 100%, 60%);
-  --hivis-dark: hsl(0, 0%, 18%);
-  --hivis-gray: hsl(0, 0%, 96%);
+  /* Hi-Vis Industrial Colors */
+  --hivis-orange: hsl(25, 100%, 50%);        /* Signal Orange #FF6B00 */
+  --hivis-yellow: hsl(49, 100%, 50%);        /* Safety Yellow #FFD500 */
+  --hivis-charcoal: hsl(0, 0%, 11%);         /* Charcoal Black #1C1C1C */
+  --hivis-concrete: hsl(0, 0%, 48%);         /* Concrete Grey #7A7A7A */
+  --hivis-white: hsl(0, 0%, 100%);           /* Clean White #FFFFFF */
 }
 
 .dark {
-  --background: hsl(0, 0%, 18%);
-  --foreground: hsl(0, 0%, 98%);
-  --muted: hsl(0, 0%, 25%);
-  --muted-foreground: hsl(240, 5%, 64.9%);
-  --popover: hsl(0, 0%, 18%);
-  --popover-foreground: hsl(0, 0%, 98%);
-  --card: hsl(0, 0%, 18%);
-  --card-foreground: hsl(0, 0%, 98%);
-  --border: hsl(240, 3.7%, 15.9%);
-  --input: hsl(240, 3.7%, 15.9%);
-  --primary: hsl(30, 100%, 50%);
-  --primary-foreground: hsl(0, 0%, 18%);
-  --secondary: hsl(45, 100%, 60%);
-  --secondary-foreground: hsl(0, 0%, 18%);
-  --accent: hsl(240, 3.7%, 15.9%);
-  --accent-foreground: hsl(0, 0%, 98%);
-  --destructive: hsl(0, 62.8%, 30.6%);
-  --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(240, 4.9%, 83.9%);
+  --background: hsl(0, 0%, 11%);
+  --foreground: hsl(0, 0%, 100%);
+  --muted: hsl(0, 0%, 18%);
+  --muted-foreground: hsl(0, 0%, 48%);
+  --popover: hsl(0, 0%, 11%);
+  --popover-foreground: hsl(0, 0%, 100%);
+  --card: hsl(0, 0%, 11%);
+  --card-foreground: hsl(0, 0%, 100%);
+  --border: hsl(0, 0%, 24%);
+  --input: hsl(0, 0%, 18%);
+  --primary: hsl(25, 100%, 50%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(49, 100%, 50%);
+  --secondary-foreground: hsl(0, 0%, 11%);
+  --accent: hsl(49, 100%, 50%);
+  --accent-foreground: hsl(0, 0%, 11%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --ring: hsl(25, 100%, 50%);
 }
 
 @layer base {
@@ -67,23 +68,35 @@
   .safety-stripes {
     background: repeating-linear-gradient(
       45deg,
-      hsl(45, 100%, 60%),
-      hsl(45, 100%, 60%) 10px,
-      hsl(30, 100%, 50%) 10px,
-      hsl(30, 100%, 50%) 20px
+      hsl(49, 100%, 50%),
+      hsl(49, 100%, 50%) 10px,
+      hsl(25, 100%, 50%) 10px,
+      hsl(25, 100%, 50%) 20px
     );
   }
   
   .gradient-orange {
-    background: linear-gradient(135deg, hsl(30, 100%, 50%) 0%, hsl(45, 100%, 60%) 100%);
+    background: linear-gradient(135deg, hsl(25, 100%, 50%) 0%, hsl(49, 100%, 50%) 100%);
+  }
+  
+  .gradient-industrial {
+    background: linear-gradient(135deg, hsl(0, 0%, 11%) 0%, hsl(0, 0%, 48%) 50%, hsl(25, 100%, 50%) 100%);
   }
   
   .card-shadow {
-    box-shadow: 0 4px 6px -1px hsla(30, 100%, 50%, 0.1), 0 2px 4px -1px hsla(30, 100%, 50%, 0.06);
+    box-shadow: 0 4px 6px -1px hsla(25, 100%, 50%, 0.1), 0 2px 4px -1px hsla(25, 100%, 50%, 0.06);
+  }
+  
+  .card-shadow-concrete {
+    box-shadow: 0 8px 16px -4px hsla(0, 0%, 48%, 0.15), 0 4px 8px -2px hsla(0, 0%, 48%, 0.1);
   }
   
   .pulse-orange {
     animation: pulse-orange 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  .pulse-yellow {
+    animation: pulse-yellow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
   
   @keyframes pulse-orange {
@@ -92,6 +105,15 @@
     }
     50% {
       opacity: .7;
+    }
+  }
+  
+  @keyframes pulse-yellow {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: .6;
     }
   }
 }

@@ -1,9 +1,11 @@
 import { useLocation } from "wouter";
-import { Home, QrCode, Gift, User, Trophy } from "lucide-react";
+import { Home, QrCode, Gift, User, Trophy, Shield } from "lucide-react";
 import { Link } from "wouter";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Navigation() {
   const [location] = useLocation();
+  const { user } = useAuth();
 
   const isActive = (path: string) => location === path;
 
@@ -74,6 +76,21 @@ export default function Navigation() {
             </span>
           </button>
         </Link>
+        
+        {user?.isAdmin && (
+          <Link href="/admin" className="flex-1">
+            <button className="w-full py-3 px-2 text-center">
+              <Shield className={`w-4 h-4 mx-auto mb-1 ${
+                isActive('/admin') ? 'text-orange-500' : 'text-slate-400'
+              }`} />
+              <span className={`text-xs font-medium ${
+                isActive('/admin') ? 'text-orange-500' : 'text-slate-400'
+              }`}>
+                Admin
+              </span>
+            </button>
+          </Link>
+        )}
       </div>
     </nav>
   );

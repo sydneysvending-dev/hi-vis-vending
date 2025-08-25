@@ -51,6 +51,13 @@ export default {
           "4": "var(--chart-4)",
           "5": "var(--chart-5)",
         },
+        hivis: {
+          orange: "var(--hivis-orange)",
+          yellow: "var(--hivis-yellow)",
+          charcoal: "var(--hivis-charcoal)",
+          concrete: "var(--hivis-concrete)",
+          white: "var(--hivis-white)",
+        },
         sidebar: {
           DEFAULT: "var(--sidebar-background)",
           foreground: "var(--sidebar-foreground)",
