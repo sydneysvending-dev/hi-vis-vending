@@ -20,6 +20,28 @@ import ForgotPassword from "@/pages/forgot-password";
 import ResetPassword from "@/pages/reset-password";
 import Developer from "@/pages/developer";
 import TransactionHistory from "@/pages/transaction-history";
+import { AnimationProvider, useAnimation } from "@/contexts/AnimationContext";
+import PointsGainedAnimation from "@/components/PointsGainedAnimation";
+import TierUpgradeAnimation from "@/components/TierUpgradeAnimation";
+
+function AnimationOverlay() {
+  const { animationState, hidePointsGained, hideTierUpgrade } = useAnimation();
+  
+  return (
+    <>
+      <PointsGainedAnimation
+        points={animationState.pointsGained.points}
+        isVisible={animationState.pointsGained.isVisible}
+        onComplete={hidePointsGained}
+      />
+      <TierUpgradeAnimation
+        newTier={animationState.tierUpgrade.newTier}
+        isVisible={animationState.tierUpgrade.isVisible}
+        onComplete={hideTierUpgrade}
+      />
+    </>
+  );
+}
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -58,10 +80,13 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Router />
-      </TooltipProvider>
+      <AnimationProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Router />
+          <AnimationOverlay />
+        </TooltipProvider>
+      </AnimationProvider>
     </QueryClientProvider>
   );
 }

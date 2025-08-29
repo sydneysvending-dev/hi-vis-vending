@@ -6,12 +6,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { QrCode, CheckCircle, ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
+import { useAnimation } from "@/contexts/AnimationContext";
 
 export default function Scan() {
   const [isScanning, setIsScanning] = useState(false);
   const [scanResult, setScanResult] = useState<any>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { showPointsGained, showTierUpgrade } = useAnimation();
 
   const scanMutation = useMutation({
     mutationFn: async (qrData: string) => {
@@ -21,6 +23,19 @@ export default function Scan() {
     onSuccess: (data) => {
       setScanResult(data);
       setIsScanning(false);
+      
+      // Show points gained animation
+      if (data.pointsEarned) {
+        showPointsGained(data.pointsEarned);
+      }
+      
+      // Check if user upgraded tier and show animation
+      if (data.tierUpgrade) {
+        setTimeout(() => {
+          showTierUpgrade(data.tierUpgrade);
+        }, 1500); // Delay tier animation after points animation
+      }
+      
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       queryClient.invalidateQueries({ queryKey: ["/api/user/transactions"] });
       toast({
@@ -78,6 +93,33 @@ export default function Scan() {
                 Go to My Code
               </Button>
             </Link>
+          </CardContent>
+        </Card>
+
+        {/* Animation Demo Section */}
+        <Card className="border-orange-200 mt-4">
+          <CardContent className="p-6">
+            <h3 className="text-lg font-semibold mb-4 text-orange-800">Animation Demo</h3>
+            <div className="space-y-3">
+              <Button 
+                onClick={() => showPointsGained(25)}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                Demo: +25 Points Animation
+              </Button>
+              <Button 
+                onClick={() => showTierUpgrade("tradie")}
+                className="w-full bg-green-600 hover:bg-green-700 text-white"
+              >
+                Demo: Tier Upgrade (Tradie)
+              </Button>
+              <Button 
+                onClick={() => showTierUpgrade("foreman")}
+                className="w-full bg-yellow-600 hover:bg-yellow-700 text-white"
+              >
+                Demo: Tier Upgrade (Foreman)
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { apiRequest } from "@/lib/queryClient";
 import Navigation from "@/components/Navigation";
-import LoyaltyProgress from "@/components/LoyaltyProgress";
+import AnimatedLoyaltyProgress from "@/components/AnimatedLoyaltyProgress";
 import PunchCard from "@/components/PunchCard";
 import DailyStreakTracker from "@/components/DailyStreakTracker";
 import PhotoReel from "@/components/PhotoReel";
@@ -193,7 +193,7 @@ export default function Home() {
             </div>
           </div>
           
-          <LoyaltyProgress 
+          <AnimatedLoyaltyProgress 
             tier={user.loyaltyTier || 'apprentice'}
             points={user.totalPoints || 0}
           />

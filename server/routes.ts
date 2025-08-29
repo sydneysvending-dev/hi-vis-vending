@@ -76,6 +76,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Update user points and punch card
       const user = await storage.getUser(userId);
+      let tierUpgrade = null;
+      
       if (user) {
         const newPoints = (user.totalPoints || 0) + points;
         const newPunchProgress = Math.min((user.punchCardProgress || 0) + 1, 5);
@@ -87,9 +89,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         let newTier = user.loyaltyTier;
         if (newPoints >= 500 && user.loyaltyTier === "apprentice") {
           newTier = "tradie";
+          tierUpgrade = "tradie";
           await storage.updateUserTier(userId, newTier);
         } else if (newPoints >= 1000 && user.loyaltyTier === "tradie") {
           newTier = "foreman";
+          tierUpgrade = "foreman";
           await storage.updateUserTier(userId, newTier);
         }
 
@@ -106,7 +110,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      res.json(transaction);
+      res.json({
+        ...transaction,
+        tierUpgrade
+      });
     } catch (error) {
       console.error("Error processing purchase:", error);
       res.status(500).json({ message: "Failed to process purchase" });
@@ -274,6 +281,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Update user points, punch card, and daily streak
       const user = await storage.getUser(userId);
+      let tierUpgrade = null;
+      
       if (user) {
         const newPoints = (user.totalPoints || 0) + 10;
         const newPunchProgress = Math.min((user.punchCardProgress || 0) + 1, 5);
@@ -281,6 +290,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.updateUserPoints(userId, newPoints);
         await storage.updatePunchCard(userId, newPunchProgress);
         await storage.updateDailyStreak(userId);
+        
+        // Check for tier upgrade
+        let newTier = user.loyaltyTier;
+        if (newPoints >= 500 && user.loyaltyTier === "apprentice") {
+          newTier = "tradie";
+          tierUpgrade = "tradie";
+          await storage.updateUserTier(userId, newTier);
+        } else if (newPoints >= 1000 && user.loyaltyTier === "tradie") {
+          newTier = "foreman";
+          tierUpgrade = "foreman";
+          await storage.updateUserTier(userId, newTier);
+        }
         
         // Check for punch card completion
         if (newPunchProgress === 5) {
@@ -298,7 +319,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ 
         success: true, 
         pointsEarned: 10,
-        transaction 
+        transaction,
+        tierUpgrade
       });
     } catch (error) {
       console.error("Error processing QR scan:", error);
@@ -780,12 +802,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Update user points and punch card
       const user = await storage.getUser(userId);
+      let tierUpgrade = null;
+      
       if (user) {
         const newTotalPoints = (user.totalPoints || 0) + pointsEarned;
         await storage.updateUserPoints(userId, newTotalPoints);
 
         const newPunchProgress = Math.min((user.punchCardProgress || 0) + 1, 5);
         await storage.updatePunchCard(userId, newPunchProgress);
+
+        // Check for tier upgrade
+        let newTier = user.loyaltyTier;
+        if (newTotalPoints >= 500 && user.loyaltyTier === "apprentice") {
+          newTier = "tradie";
+          tierUpgrade = "tradie";
+          await storage.updateUserTier(userId, newTier);
+        } else if (newTotalPoints >= 1000 && user.loyaltyTier === "tradie") {
+          newTier = "foreman";
+          tierUpgrade = "foreman";
+          await storage.updateUserTier(userId, newTier);
+        }
 
         // Check for punch card completion
         if (newPunchProgress === 5) {
@@ -803,7 +839,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ 
         success: true, 
         pointsEarned,
-        message: `Earned ${pointsEarned} points!`
+        message: `Earned ${pointsEarned} points!`,
+        tierUpgrade
       });
     } catch (error) {
       console.error("Error processing QR purchase:", error);
