@@ -58,30 +58,19 @@ export default function MyCode() {
   const [qrData, setQrData] = useState<string>("");
   const [lastGenerated, setLastGenerated] = useState<Date | null>(null);
 
-  // Generate QR code data
-  const generateQRData = () => {
-    if (!user) return "";
+  // Get permanent QR code data
+  const { data: permanentQrCode, isLoading: isQrLoading } = useQuery({
+    queryKey: [`/api/user/permanent-qr-code`],
+    enabled: !!user?.id,
+  });
 
-    const qrPayload = {
-      userId: user.id,
-      timestamp: Date.now(),
-      tier: (user as any).currentTier || 'Apprentice',
-      points: (user as any).totalPoints || 0,
-      type: 'hi-vis-customer',
-      token: Math.random().toString(36).substring(2, 15)
-    };
-
-    return JSON.stringify(qrPayload);
-  };
-
-  // Auto-generate QR code when component mounts or user changes
+  // Auto-set QR code when permanent code is loaded
   useEffect(() => {
-    if (user) {
-      const newQrData = generateQRData();
-      setQrData(newQrData);
-      setLastGenerated(new Date());
+    if (permanentQrCode?.qrCode) {
+      setQrData(permanentQrCode.qrCode);
+      setLastGenerated(null); // No need for refresh timestamp with permanent codes
     }
-  }, [user]);
+  }, [permanentQrCode]);
 
   // Copy QR data to clipboard
   const copyQRData = async () => {
@@ -130,7 +119,22 @@ export default function MyCode() {
           <Card>
             <CardContent className="p-6 text-center">
               <QrCode className="w-12 h-12 mx-auto mb-4 text-orange-600" />
-              <p>Loading your personal QR code...</p>
+              <p>Please log in to view your QR code</p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (isQrLoading || !qrData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50 p-4">
+        <div className="max-w-md mx-auto pt-20">
+          <Card>
+            <CardContent className="p-6 text-center">
+              <QrCode className="w-12 h-12 mx-auto mb-4 text-orange-600 animate-pulse" />
+              <p>Generating your permanent QR code...</p>
             </CardContent>
           </Card>
         </div>
@@ -157,7 +161,7 @@ export default function MyCode() {
               Your Personal QR Code
             </CardTitle>
             <CardDescription>
-              Scan this at vending machines for instant promotions
+              This permanent code identifies you at all Hi-Vis vending machines
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

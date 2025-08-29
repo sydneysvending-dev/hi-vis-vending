@@ -23,6 +23,7 @@ interface MomaTransaction {
   date: string;
   amount: number;
   cardNumber?: string;
+  qrCode?: string; // Add QR code support for new integration method
   product: string;
   machineId?: string;
   transactionId: string;
@@ -253,13 +254,14 @@ export class AWSMomaSync {
         externalId: transactionData.transactionId,
         machineId: transactionData.machineId || "unknown",
         cardNumber: transactionData.cardNumber,
+        qrCode: transactionData.qrCode, // Add QR code data for matching
         amount: transactionData.amount,
         productName: transactionData.product,
         timestamp: new Date(transactionData.date),
         pointsEarned, // Add calculated points based on product type
       };
 
-      // Process through existing external transaction system
+      // Process through existing external transaction system with QR code support
       await storage.processExternalTransactionWithPoints(externalTransaction);
       
       console.log(`Processed transaction: ${transactionData.transactionId} - ${transactionData.product} (${pointsEarned} points)`);

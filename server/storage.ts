@@ -223,6 +223,57 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
+  private generatePermanentQrCode(): string {
+    // Generate a longer, more secure code for permanent QR codes
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = 'HIVIS-';
+    for (let i = 0; i < 12; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  }
+
+  async generateUserPermanentQrCode(userId: string): Promise<string> {
+    const user = await this.getUser(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // If user already has a permanent QR code, return it
+    if (user.permanentQrCode) {
+      return user.permanentQrCode;
+    }
+
+    // Generate new permanent QR code
+    let qrCode = this.generatePermanentQrCode();
+    
+    // Ensure uniqueness
+    let existingUser = await this.getUserByPermanentQrCode(qrCode);
+    while (existingUser) {
+      qrCode = this.generatePermanentQrCode();
+      existingUser = await this.getUserByPermanentQrCode(qrCode);
+    }
+
+    // Update user with permanent QR code
+    await db
+      .update(users)
+      .set({ 
+        permanentQrCode: qrCode,
+        updatedAt: new Date()
+      })
+      .where(eq(users.id, userId));
+
+    return qrCode;
+  }
+
+  async getUserByPermanentQrCode(qrCode: string): Promise<User | undefined> {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.permanentQrCode, qrCode));
+    return user;
+  }
+
   private capitalizeName(name: string): string {
     if (!name || !name.trim()) return name;
     return name.trim()
@@ -605,6 +656,7 @@ export class DatabaseStorage implements IStorage {
         externalId: transaction.externalId,
         machineId: transaction.machineId,
         cardNumber: transaction.cardNumber,
+        qrCode: transaction.qrCode, // Add QR code to external transaction record
         amount: transaction.amount,
         productName: transaction.productName,
         timestamp: transaction.timestamp,
@@ -612,9 +664,20 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
 
-    // Try to match to a user by card number
+    let user = null;
+
+    // Try to match to a user by permanent QR code first (preferred method)
+    if (transaction.qrCode) {
+      user = await this.getUserByPermanentQrCode(transaction.qrCode);
+      if (user) {
+        await this.matchTransactionToUserWithPoints(externalTx.id, user.id, transaction.pointsEarned);
+        return;
+      }
+    }
+
+    // Fall back to matching by card number if QR code match fails
     if (transaction.cardNumber) {
-      const user = await this.getUserByCardNumber(transaction.cardNumber);
+      user = await this.getUserByCardNumber(transaction.cardNumber);
       if (user) {
         await this.matchTransactionToUserWithPoints(externalTx.id, user.id, transaction.pointsEarned);
       }

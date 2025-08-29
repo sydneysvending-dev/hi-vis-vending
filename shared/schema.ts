@@ -47,6 +47,7 @@ export const users = pgTable("users", {
   // External integration
   cardNumber: varchar("card_number").unique(), // For matching vending machine transactions
   phoneNumber: varchar("phone_number"), // Alternative matching method
+  permanentQrCode: varchar("permanent_qr_code").unique(), // Static QR code for vending machine scanning
   // Location information
   suburb: varchar("suburb").notNull(), // Mandatory field for grouping customers by construction sites
   // Daily streak tracking
@@ -99,6 +100,7 @@ export const externalTransactions = pgTable("external_transactions", {
   externalId: varchar("external_id").unique().notNull(), // From Moma app
   machineId: varchar("machine_id").notNull(),
   cardNumber: varchar("card_number"),
+  qrCode: varchar("qr_code"), // For permanent QR code matching
   amount: integer("amount").notNull(), // In cents
   productName: varchar("product_name"),
   timestamp: timestamp("timestamp").notNull(),

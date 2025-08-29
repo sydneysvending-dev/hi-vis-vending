@@ -438,6 +438,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get('/api/user/permanent-qr-code', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const qrCode = await storage.generateUserPermanentQrCode(userId);
+      res.json({ qrCode });
+    } catch (error) {
+      console.error("Error getting permanent QR code:", error);
+      res.status(500).json({ message: "Failed to get permanent QR code" });
+    }
+  });
+
   // Moma Integration Routes
   
   // Webhook endpoint for Moma to send real-time transaction data

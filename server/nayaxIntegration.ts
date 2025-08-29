@@ -44,45 +44,72 @@ export class NayaxIntegration {
     message: string;
   }> {
     try {
-      // Parse QR code data
-      const qrCodeData: QRCodeData = JSON.parse(qrData);
-      
-      // Basic validation
-      if (qrCodeData.type !== 'hi-vis-customer') {
-        return {
-          isValid: false,
-          promotions: [],
-          pointsBonus: 0,
-          discountPercentage: 0,
-          message: 'Invalid QR code type'
-        };
-      }
+      let user = null;
 
-      // Check timestamp (QR codes expire after 24 hours)
-      const now = Date.now();
-      const qrAge = now - qrCodeData.timestamp;
-      const maxAge = 24 * 60 * 60 * 1000; // 24 hours
+      // Check if this is a permanent QR code (preferred method)
+      if (qrData.startsWith('HIVIS-')) {
+        // This is a permanent QR code - look up user directly
+        user = await storage.getUserByPermanentQrCode(qrData);
+        if (!user) {
+          return {
+            isValid: false,
+            promotions: [],
+            pointsBonus: 0,
+            discountPercentage: 0,
+            message: 'Invalid permanent QR code'
+          };
+        }
+      } else {
+        // Legacy support: Try to parse as old-format JSON QR code
+        try {
+          const qrCodeData: QRCodeData = JSON.parse(qrData);
+          
+          // Basic validation for legacy format
+          if (qrCodeData.type !== 'hi-vis-customer') {
+            return {
+              isValid: false,
+              promotions: [],
+              pointsBonus: 0,
+              discountPercentage: 0,
+              message: 'Invalid QR code type'
+            };
+          }
 
-      if (qrAge > maxAge) {
-        return {
-          isValid: false,
-          promotions: [],
-          pointsBonus: 0,
-          discountPercentage: 0,
-          message: 'QR code has expired. Please generate a new one.'
-        };
-      }
+          // Check timestamp (QR codes expire after 24 hours)
+          const now = Date.now();
+          const qrAge = now - qrCodeData.timestamp;
+          const maxAge = 24 * 60 * 60 * 1000; // 24 hours
 
-      // Get user from database
-      const user = await storage.getUser(qrCodeData.userId);
-      if (!user) {
-        return {
-          isValid: false,
-          promotions: [],
-          pointsBonus: 0,
-          discountPercentage: 0,
-          message: 'User not found'
-        };
+          if (qrAge > maxAge) {
+            return {
+              isValid: false,
+              promotions: [],
+              pointsBonus: 0,
+              discountPercentage: 0,
+              message: 'QR code has expired. Please generate a new one.'
+            };
+          }
+
+          // Get user from database
+          user = await storage.getUser(qrCodeData.userId);
+          if (!user) {
+            return {
+              isValid: false,
+              promotions: [],
+              pointsBonus: 0,
+              discountPercentage: 0,
+              message: 'User not found'
+            };
+          }
+        } catch (parseError) {
+          return {
+            isValid: false,
+            promotions: [],
+            pointsBonus: 0,
+            discountPercentage: 0,
+            message: 'Invalid QR code format'
+          };
+        }
       }
 
       // Get available promotions for user's tier
