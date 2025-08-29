@@ -13,7 +13,7 @@
   --card-foreground: hsl(0, 0%, 11%);
   --border: hsl(0, 0%, 88%);
   --input: hsl(0, 0%, 92%);
-  --primary: hsl(25, 100%, 50%);
+  --primary: hsl(25, 100%, 48%);
   --primary-foreground: hsl(0, 0%, 100%);
   --secondary: hsl(49, 100%, 50%);
   --secondary-foreground: hsl(0, 0%, 11%);
@@ -21,11 +21,11 @@
   --accent-foreground: hsl(0, 0%, 11%);
   --destructive: hsl(0, 84.2%, 60.2%);
   --destructive-foreground: hsl(0, 0%, 100%);
-  --ring: hsl(25, 100%, 50%);
+  --ring: hsl(25, 100%, 48%);
   --radius: 0.5rem;
   
   /* Hi-Vis Industrial Colors */
-  --hivis-orange: hsl(25, 100%, 50%);        /* Signal Orange #FF6B00 */
+  --hivis-orange: hsl(25, 100%, 48%);        /* Orange #f58b00 */
   --hivis-yellow: hsl(49, 100%, 50%);        /* Safety Yellow #FFD500 */
   --hivis-charcoal: hsl(0, 0%, 11%);         /* Charcoal Black #1C1C1C */
   --hivis-concrete: hsl(0, 0%, 48%);         /* Concrete Grey #7A7A7A */
@@ -43,7 +43,7 @@
   --card-foreground: hsl(0, 0%, 100%);
   --border: hsl(0, 0%, 24%);
   --input: hsl(0, 0%, 18%);
-  --primary: hsl(25, 100%, 50%);
+  --primary: hsl(25, 100%, 48%);
   --primary-foreground: hsl(0, 0%, 100%);
   --secondary: hsl(49, 100%, 50%);
   --secondary-foreground: hsl(0, 0%, 11%);
@@ -51,7 +51,7 @@
   --accent-foreground: hsl(0, 0%, 11%);
   --destructive: hsl(0, 84.2%, 60.2%);
   --destructive-foreground: hsl(0, 0%, 100%);
-  --ring: hsl(25, 100%, 50%);
+  --ring: hsl(25, 100%, 48%);
 }
 
 @layer base {
@@ -70,21 +70,21 @@
       45deg,
       hsl(49, 100%, 50%),
       hsl(49, 100%, 50%) 10px,
-      hsl(25, 100%, 50%) 10px,
-      hsl(25, 100%, 50%) 20px
+      hsl(25, 100%, 48%) 10px,
+      hsl(25, 100%, 48%) 20px
     );
   }
   
   .gradient-orange {
-    background: linear-gradient(135deg, hsl(25, 100%, 50%) 0%, hsl(49, 100%, 50%) 100%);
+    background: linear-gradient(135deg, hsl(25, 100%, 48%) 0%, hsl(49, 100%, 50%) 100%);
   }
   
   .gradient-industrial {
-    background: linear-gradient(135deg, hsl(0, 0%, 11%) 0%, hsl(0, 0%, 48%) 50%, hsl(25, 100%, 50%) 100%);
+    background: linear-gradient(135deg, hsl(0, 0%, 11%) 0%, hsl(0, 0%, 48%) 50%, hsl(25, 100%, 48%) 100%);
   }
   
   .card-shadow {
-    box-shadow: 0 4px 6px -1px hsla(25, 100%, 50%, 0.1), 0 2px 4px -1px hsla(25, 100%, 50%, 0.06);
+    box-shadow: 0 4px 6px -1px hsla(25, 100%, 48%, 0.1), 0 2px 4px -1px hsla(25, 100%, 48%, 0.06);
   }
   
   .card-shadow-concrete {
