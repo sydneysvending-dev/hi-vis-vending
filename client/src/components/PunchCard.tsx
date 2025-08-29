@@ -2,11 +2,11 @@ import { HardHat } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface PunchCardProps {
-  progress: number; // 0-10
+  progress: number; // 0-5
 }
 
 export default function PunchCard({ progress }: PunchCardProps) {
-  const totalSlots = 10;
+  const totalSlots = 5;
   const completed = Math.min(progress, totalSlots);
 
   return (
@@ -17,7 +17,7 @@ export default function PunchCard({ progress }: PunchCardProps) {
           <div className="safety-stripes w-8 h-4 rounded"></div>
         </div>
         
-        <p className="text-slate-600 mb-4">Collect 10 punches for a free large drink!</p>
+        <p className="text-slate-600 mb-4">Collect 5 punches for a free large drink!</p>
         
         {/* Punch Card Grid */}
         <div className="grid grid-cols-5 gap-3 mb-4">

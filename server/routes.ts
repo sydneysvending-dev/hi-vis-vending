@@ -78,7 +78,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = await storage.getUser(userId);
       if (user) {
         const newPoints = (user.totalPoints || 0) + points;
-        const newPunchProgress = Math.min((user.punchCardProgress || 0) + 1, 10);
+        const newPunchProgress = Math.min((user.punchCardProgress || 0) + 1, 5);
         
         await storage.updateUserPoints(userId, newPoints);
         await storage.updatePunchCard(userId, newPunchProgress);
@@ -94,7 +94,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
 
         // Check for punch card completion
-        if (newPunchProgress === 10) {
+        if (newPunchProgress === 5) {
           await storage.createTransaction({
             userId,
             type: "bonus",
@@ -276,14 +276,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = await storage.getUser(userId);
       if (user) {
         const newPoints = (user.totalPoints || 0) + 10;
-        const newPunchProgress = Math.min((user.punchCardProgress || 0) + 1, 10);
+        const newPunchProgress = Math.min((user.punchCardProgress || 0) + 1, 5);
         
         await storage.updateUserPoints(userId, newPoints);
         await storage.updatePunchCard(userId, newPunchProgress);
         await storage.updateDailyStreak(userId);
         
         // Check for punch card completion
-        if (newPunchProgress === 10) {
+        if (newPunchProgress === 5) {
           await storage.createTransaction({
             userId,
             type: "bonus",
@@ -784,11 +784,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const newTotalPoints = (user.totalPoints || 0) + pointsEarned;
         await storage.updateUserPoints(userId, newTotalPoints);
 
-        const newPunchProgress = Math.min((user.punchCardProgress || 0) + 1, 10);
+        const newPunchProgress = Math.min((user.punchCardProgress || 0) + 1, 5);
         await storage.updatePunchCard(userId, newPunchProgress);
 
         // Check for punch card completion
-        if (newPunchProgress === 10) {
+        if (newPunchProgress === 5) {
           await storage.createTransaction({
             userId,
             type: "bonus",
