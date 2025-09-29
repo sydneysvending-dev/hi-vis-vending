@@ -1,0 +1,461 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hi-Vis Vending - Loyalty Rewards</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    'hv-green': '#22C55E',
+                    'hv-yellow': '#EAB308',
+                    'hv-orange': '#F97316',
+                    'hv-dark': '#1F2937',
+                    'hv-light': '#F3F4F6'
+                },
+                fontFamily: {
+                    'inter': ['Inter', 'sans-serif']
+                }
+            }
+        }
+    };
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-hv-light font-inter">
+    <!-- @COMPONENT: MobileApp [main container] -->
+    <div class="max-w-md mx-auto bg-white min-h-screen shadow-2xl">
+        
+        <!-- @COMPONENT: AppHeader [navigation and user info] -->
+        <header class="bg-gradient-to-r from-hv-green to-emerald-400 px-6 py-8 text-white">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+                        <i class="fas fa-coffee text-hv-green text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold">Hi-Vis Vending</h1>
+                        <p class="text-green-100 text-sm">Loyalty Rewards</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-bell text-xl"></i>
+                    <div class="w-10 h-10 bg-white rounded-full overflow-hidden">
+                        <!-- Professional headshot of a construction worker in hi-vis gear -->
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&h=100" 
+                             alt="User profile" 
+                             class="w-full h-full object-cover" 
+                             data-mock="true">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- @COMPONENT: UserGreeting [personalized welcome] -->
+            <div class="mb-4">
+                <h2 class="text-2xl font-bold" data-bind="user.firstName">Hey Mike!</h2>
+                <p class="text-green-100">Ready to earn some rewards?</p>
+            </div>
+        </header>
+        <!-- @END_COMPONENT: AppHeader -->
+
+        <!-- @COMPONENT: MainContent [scrollable content area] -->
+        <main class="px-6 py-6 space-y-6">
+            
+            <!-- @COMPONENT: LoyaltyStatus [tier and points display] -->
+            <div class="bg-gradient-to-br from-hv-yellow to-amber-400 rounded-2xl p-6 text-white shadow-lg">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-lg font-semibold">Loyalty Status</h3>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-medal text-2xl"></i>
+                            <span class="text-xl font-bold" data-bind="user.tier">Silver Member</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm opacity-80">Current Points</p>
+                        <p class="text-3xl font-bold" data-bind="user.points">847</p>
+                    </div>
+                </div>
+                
+                <!-- Progress to next tier -->
+                <div class="mb-4">
+                    <div class="flex justify-between text-sm mb-2">
+                        <span>Progress to Gold</span>
+                        <span data-bind="user.progressToNext">153 points to go</span>
+                    </div>
+                    <div class="w-full bg-amber-300 rounded-full h-3">
+                        <div class="bg-white h-3 rounded-full" style="width: 85%" data-bind="user.progressPercent"></div>
+                    </div>
+                </div>
+                
+                <!-- @COMPONENT: QuickActions [scan and redeem buttons] -->
+                <div class="grid grid-cols-2 gap-3">
+                    <button class="bg-white text-hv-yellow font-semibold py-3 px-4 rounded-xl flex items-center justify-center space-x-2 shadow-md"
+                            data-event="click:openQRScanner">
+                        <i class="fas fa-qrcode"></i>
+                        <span>Scan QR</span>
+                    </button>
+                    <button class="bg-hv-green text-white font-semibold py-3 px-4 rounded-xl flex items-center justify-center space-x-2 shadow-md"
+                            data-event="click:openRewards">
+                        <i class="fas fa-gift"></i>
+                        <span>Redeem</span>
+                    </button>
+                </div>
+            </div>
+            <!-- @END_COMPONENT: LoyaltyStatus -->
+
+            <!-- @COMPONENT: PunchCards [digital punch card display] -->
+            <div class="space-y-4">
+                <h3 class="text-xl font-bold text-hv-dark">Active Punch Cards</h3>
+                
+                <!-- Coffee Punch Card -->
+                <div class="bg-white rounded-2xl p-5 shadow-md border border-gray-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-coffee text-amber-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-hv-dark">Hot Beverages</h4>
+                                <p class="text-sm text-gray-500">Buy 10, Get 1 Free</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-2xl font-bold text-hv-green" data-bind="punchCard.coffee.count">7</p>
+                            <p class="text-xs text-gray-500">of 10</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Punch holes visualization -->
+                    <div class="grid grid-cols-5 gap-2 mb-3">
+                        <!-- @MAP: Array(10).fill().map((_, i) => ( -->
+                        <div class="w-8 h-8 rounded-full bg-hv-green flex items-center justify-center">
+                            <i class="fas fa-check text-white text-xs"></i>
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-hv-green flex items-center justify-center">
+                            <i class="fas fa-check text-white text-xs"></i>
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-hv-green flex items-center justify-center">
+                            <i class="fas fa-check text-white text-xs"></i>
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-hv-green flex items-center justify-center">
+                            <i class="fas fa-check text-white text-xs"></i>
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-hv-green flex items-center justify-center">
+                            <i class="fas fa-check text-white text-xs"></i>
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-hv-green flex items-center justify-center">
+                            <i class="fas fa-check text-white text-xs"></i>
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-hv-green flex items-center justify-center">
+                            <i class="fas fa-check text-white text-xs"></i>
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-gray-200 border-2 border-dashed border-gray-300"></div>
+                        <div class="w-8 h-8 rounded-full bg-gray-200 border-2 border-dashed border-gray-300"></div>
+                        <div class="w-8 h-8 rounded-full bg-gray-200 border-2 border-dashed border-gray-300"></div>
+                        <!-- @END_MAP )) -->
+                    </div>
+                    
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-hv-green h-2 rounded-full" style="width: 70%"></div>
+                    </div>
+                </div>
+
+                <!-- Snacks Punch Card -->
+                <div class="bg-white rounded-2xl p-5 shadow-md border border-gray-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-cookie-bite text-orange-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-hv-dark">Snacks & Treats</h4>
+                                <p class="text-sm text-gray-500">Buy 15, Get 1 Free</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-2xl font-bold text-hv-green" data-bind="punchCard.snacks.count">3</p>
+                            <p class="text-xs text-gray-500">of 15</p>
+                        </div>
+                    </div>
+                    
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-hv-green h-2 rounded-full" style="width: 20%"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- @END_COMPONENT: PunchCards -->
+
+            <!-- @COMPONENT: AvailableRewards [redeemable rewards list] -->
+            <div class="space-y-4">
+                <h3 class="text-xl font-bold text-hv-dark">Available Rewards</h3>
+                
+                <!-- @MAP: availableRewards.map(reward => ( -->
+                <div class="bg-white rounded-2xl p-5 shadow-md border border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 bg-gradient-to-br from-hv-green to-emerald-400 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-coffee text-white text-2xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-hv-dark" data-bind="reward.name">Free Hot Coffee</h4>
+                                <p class="text-sm text-gray-500" data-bind="reward.description">Any hot beverage of your choice</p>
+                                <div class="flex items-center space-x-1 mt-1">
+                                    <i class="fas fa-coins text-hv-yellow text-sm"></i>
+                                    <span class="text-sm font-medium text-hv-green" data-bind="reward.cost">100 points</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="bg-hv-green text-white font-semibold py-2 px-4 rounded-xl"
+                                data-event="click:redeemReward" 
+                                data-implementation="Should check if user has enough points">
+                            Redeem
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 shadow-md border border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 bg-gradient-to-br from-hv-yellow to-amber-400 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-cookie-bite text-white text-2xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-hv-dark">Free Snack</h4>
+                                <p class="text-sm text-gray-500">Any snack item under $2.50</p>
+                                <div class="flex items-center space-x-1 mt-1">
+                                    <i class="fas fa-coins text-hv-yellow text-sm"></i>
+                                    <span class="text-sm font-medium text-hv-green">75 points</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="bg-hv-green text-white font-semibold py-2 px-4 rounded-xl"
+                                data-event="click:redeemReward">
+                            Redeem
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 shadow-md border border-gray-100 opacity-60">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 bg-gradient-to-br from-hv-orange to-red-400 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-gift text-white text-2xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-400">Premium Bundle</h4>
+                                <p class="text-sm text-gray-400">Coffee + Snack + Energy Drink</p>
+                                <div class="flex items-center space-x-1 mt-1">
+                                    <i class="fas fa-coins text-gray-400 text-sm"></i>
+                                    <span class="text-sm font-medium text-gray-400">250 points</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="bg-gray-300 text-gray-500 font-semibold py-2 px-4 rounded-xl cursor-not-allowed"
+                                disabled>
+                            Need 250
+                        </button>
+                    </div>
+                </div>
+                <!-- @END_MAP )) -->
+            </div>
+            <!-- @END_COMPONENT: AvailableRewards -->
+
+            <!-- @COMPONENT: RecentActivity [transaction history] -->
+            <div class="space-y-4">
+                <h3 class="text-xl font-bold text-hv-dark">Recent Activity</h3>
+                
+                <!-- @MAP: recentTransactions.map(transaction => ( -->
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-plus text-hv-green"></i>
+                            </div>
+                            <div>
+                                <h5 class="font-medium text-hv-dark" data-bind="transaction.description">Coffee Purchase</h5>
+                                <p class="text-sm text-gray-500" data-bind="transaction.location">Jobsite A - North Entrance</p>
+                                <p class="text-xs text-gray-400" data-bind="transaction.date">Today, 2:14 PM</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-lg font-semibold text-hv-green" data-bind="transaction.points">+15 pts</p>
+                            <p class="text-xs text-gray-500" data-bind="transaction.amount">$3.50</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-gift text-red-500"></i>
+                            </div>
+                            <div>
+                                <h5 class="font-medium text-hv-dark">Reward Redeemed</h5>
+                                <p class="text-sm text-gray-500">Jobsite A - South Entrance</p>
+                                <p class="text-xs text-gray-400">Yesterday, 11:30 AM</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-lg font-semibold text-red-500">-100 pts</p>
+                            <p class="text-xs text-gray-500">Free Coffee</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-plus text-hv-green"></i>
+                            </div>
+                            <div>
+                                <h5 class="font-medium text-hv-dark">Snack Purchase</h5>
+                                <p class="text-sm text-gray-500">Jobsite B - Break Room</p>
+                                <p class="text-xs text-gray-400">Yesterday, 3:45 PM</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-lg font-semibold text-hv-green">+8 pts</p>
+                            <p class="text-xs text-gray-500">$2.25</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_MAP )) -->
+            </div>
+            <!-- @END_COMPONENT: RecentActivity -->
+
+        </main>
+        <!-- @END_COMPONENT: MainContent -->
+
+        <!-- @COMPONENT: BottomNavigation [main app navigation] -->
+        <nav class="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-200 px-6 py-3">
+            <div class="flex justify-between items-center">
+                <button class="flex flex-col items-center space-y-1 py-2 px-3 text-hv-green"
+                        data-event="click:navigateHome">
+                    <i class="fas fa-home text-xl"></i>
+                    <span class="text-xs font-medium">Home</span>
+                </button>
+                
+                <button class="flex flex-col items-center space-y-1 py-2 px-3 text-gray-400"
+                        data-event="click:navigateRewards">
+                    <i class="fas fa-gift text-xl"></i>
+                    <span class="text-xs">Rewards</span>
+                </button>
+                
+                <!-- QR Scanner - Prominent central button -->
+                <button class="bg-hv-green text-white p-4 rounded-full shadow-lg transform scale-110"
+                        data-event="click:openQRScanner" 
+                        data-implementation="Should open QR code scanner with camera">
+                    <i class="fas fa-qrcode text-2xl"></i>
+                </button>
+                
+                <button class="flex flex-col items-center space-y-1 py-2 px-3 text-gray-400"
+                        data-event="click:navigateHistory">
+                    <i class="fas fa-history text-xl"></i>
+                    <span class="text-xs">History</span>
+                </button>
+                
+                <button class="flex flex-col items-center space-y-1 py-2 px-3 text-gray-400"
+                        data-event="click:navigateProfile">
+                    <i class="fas fa-user text-xl"></i>
+                    <span class="text-xs">Profile</span>
+                </button>
+            </div>
+        </nav>
+        <!-- @END_COMPONENT: BottomNavigation -->
+
+    </div>
+    <!-- @END_COMPONENT: MobileApp -->
+
+    <!-- @COMPONENT: QRScannerModal [overlay modal for QR scanning] -->
+    <div id="qrModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden">
+        <div class="flex items-center justify-center h-full px-6">
+            <div class="bg-white rounded-2xl p-6 w-full max-w-sm">
+                <div class="text-center mb-6">
+                    <h3 class="text-xl font-bold text-hv-dark mb-2">Scan QR Code</h3>
+                    <p class="text-gray-500">Point your camera at the QR code on the vending machine</p>
+                </div>
+                
+                <!-- QR Scanner placeholder -->
+                <div class="bg-gray-100 rounded-xl h-64 flex items-center justify-center mb-6"
+                     data-implementation="Replace with actual camera feed and QR scanning library">
+                    <div class="text-center">
+                        <i class="fas fa-camera text-4xl text-gray-400 mb-3"></i>
+                        <p class="text-gray-500">Camera will appear here</p>
+                    </div>
+                </div>
+                
+                <div class="flex space-x-3">
+                    <button class="flex-1 bg-gray-200 text-gray-700 font-semibold py-3 rounded-xl"
+                            data-event="click:closeQRModal">
+                        Cancel
+                    </button>
+                    <button class="flex-1 bg-hv-green text-white font-semibold py-3 rounded-xl"
+                            data-event="click:manualEntry">
+                        Manual Entry
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: QRScannerModal -->
+
+    <script>
+    (function() {
+        // TODO: Implement business logic, API calls, and state management
+        
+        // Modal handling
+        const qrModal = document.getElementById('qrModal');
+        
+        // Show QR modal
+        document.querySelectorAll('[data-event*="openQRScanner"]').forEach(button => {
+            button.addEventListener('click', () => {
+                qrModal.classList.remove('hidden');
+            });
+        });
+        
+        // Close QR modal
+        document.querySelector('[data-event*="closeQRModal"]').addEventListener('click', () => {
+            qrModal.classList.add('hidden');
+        });
+        
+        // Close modal on backdrop click
+        qrModal.addEventListener('click', (e) => {
+            if (e.target === qrModal) {
+                qrModal.classList.add('hidden');
+            }
+        });
+        
+        // Navigation handling
+        document.querySelectorAll('[data-event*="navigate"]').forEach(button => {
+            button.addEventListener('click', (e) => {
+                // Remove active state from all nav buttons
+                document.querySelectorAll('nav button').forEach(btn => {
+                    btn.classList.remove('text-hv-green');
+                    btn.classList.add('text-gray-400');
+                });
+                
+                // Add active state to clicked button
+                e.currentTarget.classList.remove('text-gray-400');
+                e.currentTarget.classList.add('text-hv-green');
+            });
+        });
+        
+        // Reward redemption handling
+        document.querySelectorAll('[data-event*="redeemReward"]').forEach(button => {
+            button.addEventListener('click', (e) => {
+                if (!button.disabled) {
+                    // TODO: Implement reward redemption logic
+                    alert('Reward redemption would be processed here');
+                }
+            });
+        });
+    })();
+    </script>
+</body>
+</html>

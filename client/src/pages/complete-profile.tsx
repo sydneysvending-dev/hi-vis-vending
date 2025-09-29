@@ -1,0 +1,153 @@
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { HardHat, MapPin, User } from "lucide-react";
+
+export default function CompleteProfile() {
+  const [fullName, setFullName] = useState("");
+  const [suburb, setSuburb] = useState("");
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Suburb mapping function
+  const mapSuburbToGroup = (selectedSuburb: string): string => {
+    switch (selectedSuburb.toLowerCase()) {
+      case 'seven hills':
+        return 'Girraween';
+      case 'parramatta':
+        return 'Harris Park';
+      case 'wahroonga':
+      case 'girraween':
+      case 'harris park':
+        return selectedSuburb;
+      default:
+        return selectedSuburb;
+    }
+  };
+
+  const suburbOptions = [
+    { value: 'Wahroonga', label: 'Wahroonga' },
+    { value: 'Girraween', label: 'Girraween' },
+    { value: 'Seven Hills', label: 'Seven Hills (counted as Girraween)' },
+    { value: 'Harris Park', label: 'Harris Park' },
+    { value: 'Parramatta', label: 'Parramatta (counted as Harris Park)' },
+  ];
+
+  const updateProfileMutation = useMutation({
+    mutationFn: async (data: { fullName: string; suburb: string }) => {
+      const response = await apiRequest("POST", "/api/auth/complete-profile", data);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      toast({
+        title: "Profile Complete!",
+        description: "Welcome to Hi-Vis Vending loyalty program!",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update profile",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!fullName.trim() || !suburb.trim()) {
+      toast({
+        title: "Required Fields",
+        description: "Please fill in all required fields to continue",
+        variant: "destructive",
+      });
+      return;
+    }
+    const mappedSuburb = mapSuburbToGroup(suburb);
+    updateProfileMutation.mutate({ 
+      fullName: fullName.trim(),
+      suburb: mappedSuburb 
+    });
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50 flex items-center justify-center p-4">
+      <div className="max-w-md w-full">
+        <Card className="border-orange-200 shadow-lg">
+          <CardHeader className="text-center">
+            <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <HardHat className="w-8 h-8 text-white" />
+            </div>
+            <CardTitle className="text-2xl text-gray-900">Complete Your Profile</CardTitle>
+            <p className="text-gray-600">
+              Welcome {user?.firstName || 'to Hi-Vis Vending'}! We need a bit more info to set up your account.
+            </p>
+          </CardHeader>
+          
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="fullName" className="text-gray-700 font-medium">
+                  Full Name *
+                </Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input
+                    id="fullName"
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="e.g. John Smith"
+                    className="pl-10 border-orange-200 focus:border-orange-500"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="suburb" className="text-gray-700 font-medium">
+                  Work Location *
+                </Label>
+                <Select value={suburb} onValueChange={setSuburb}>
+                  <SelectTrigger className="border-orange-200 focus:border-orange-500">
+                    <div className="flex items-center">
+                      <MapPin className="w-4 h-4 text-gray-400 mr-2" />
+                      <SelectValue placeholder="Select your work location" />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {suburbOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-sm text-gray-500">
+                  We use this to group you with other workers in your area for local leaderboards and promotions.
+                </p>
+              </div>
+
+              <Button
+                type="submit"
+                disabled={updateProfileMutation.isPending || !fullName.trim() || !suburb.trim()}
+                className="w-full bg-orange-600 hover:bg-orange-700 text-white"
+              >
+                {updateProfileMutation.isPending ? "Setting up..." : "Complete Profile"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,10 @@
+{
+  "appId": "au.com.sydneyselectvending.app",
+  "appName": "Hi-Vis-Vending",
+  "webDir": "dist",
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": false
+    }
+  }
+}

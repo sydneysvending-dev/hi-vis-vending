@@ -1,0 +1,97 @@
+import { useLocation } from "wouter";
+import { Home, QrCode, Gift, User, Trophy, Shield } from "lucide-react";
+import { Link } from "wouter";
+import { useAuth } from "@/hooks/useAuth";
+
+export default function Navigation() {
+  const [location] = useLocation();
+  const { user } = useAuth();
+
+  const isActive = (path: string) => location === path;
+
+  return (
+    <nav className="fixed bottom-0 left-0 right-0 bg-slate-800 border-t-2 border-orange-500">
+      <div className="flex">
+        <Link href="/" className="flex-1">
+          <button className="w-full py-3 px-2 text-center">
+            <Home className={`w-4 h-4 mx-auto mb-1 ${
+              isActive('/') ? 'text-orange-500' : 'text-slate-400'
+            }`} />
+            <span className={`text-xs font-medium ${
+              isActive('/') ? 'text-orange-500' : 'text-slate-400'
+            }`}>
+              Home
+            </span>
+          </button>
+        </Link>
+        
+        <Link href="/rewards" className="flex-1">
+          <button className="w-full py-3 px-2 text-center">
+            <Gift className={`w-4 h-4 mx-auto mb-1 ${
+              isActive('/rewards') ? 'text-orange-500' : 'text-slate-400'
+            }`} />
+            <span className={`text-xs font-medium ${
+              isActive('/rewards') ? 'text-orange-500' : 'text-slate-400'
+            }`}>
+              Rewards
+            </span>
+          </button>
+        </Link>
+        
+        <Link href="/my-code" className="flex-1">
+          <button className="w-full py-3 px-2 text-center">
+            <QrCode className={`w-4 h-4 mx-auto mb-1 ${
+              isActive('/my-code') ? 'text-orange-500' : 'text-slate-400'
+            }`} />
+            <span className={`text-xs font-medium ${
+              isActive('/my-code') ? 'text-orange-500' : 'text-slate-400'
+            }`}>
+              My Code
+            </span>
+          </button>
+        </Link>
+        
+        <Link href="/leaderboard" className="flex-1">
+          <button className="w-full py-3 px-2 text-center">
+            <Trophy className={`w-4 h-4 mx-auto mb-1 ${
+              isActive('/leaderboard') ? 'text-orange-500' : 'text-slate-400'
+            }`} />
+            <span className={`text-xs font-medium ${
+              isActive('/leaderboard') ? 'text-orange-500' : 'text-slate-400'
+            }`}>
+              Leaderboard
+            </span>
+          </button>
+        </Link>
+        
+        <Link href="/profile" className="flex-1">
+          <button className="w-full py-3 px-2 text-center">
+            <User className={`w-4 h-4 mx-auto mb-1 ${
+              isActive('/profile') ? 'text-orange-500' : 'text-slate-400'
+            }`} />
+            <span className={`text-xs font-medium ${
+              isActive('/profile') ? 'text-orange-500' : 'text-slate-400'
+            }`}>
+              Profile
+            </span>
+          </button>
+        </Link>
+        
+        {user?.isAdmin && (
+          <Link href="/admin" className="flex-1">
+            <button className="w-full py-3 px-2 text-center">
+              <Shield className={`w-4 h-4 mx-auto mb-1 ${
+                isActive('/admin') ? 'text-orange-500' : 'text-slate-400'
+              }`} />
+              <span className={`text-xs font-medium ${
+                isActive('/admin') ? 'text-orange-500' : 'text-slate-400'
+              }`}>
+                Admin
+              </span>
+            </button>
+          </Link>
+        )}
+      </div>
+    </nav>
+  );
+}
