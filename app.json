@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "5b19ccf2-7d50-4342-95d6-75f34cf54be3"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.hivisvending.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.hivisvending.app"
+    }
+  }
+}
