@@ -8,8 +8,9 @@
   },
   "scripts": {
     "start": "node dist/index.js",
-    "build": "tsc"
-  },
+    "build": "tsc",
+    "postinstall": "tsc"
+  }
   "dependencies": {
     "express": "^4.19.2",
     "axios": "^1.7.0",
