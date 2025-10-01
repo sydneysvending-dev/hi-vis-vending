@@ -45,6 +45,10 @@ target 'restexpress' do
     :privacy_file_aggregation_enabled => podfile_properties['apple.privacyManifestAggregationEnabled'] != 'false',
   )
 
+  # ✅ Explicit Folly fixes
+  pod 'RCT-Folly', :podspec => '../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec'
+  pod 'Folly', :git => 'https://github.com/facebook/folly.git', :tag => 'v2024.01.01.00'
+
   post_install do |installer|
     react_native_post_install(
       installer,
@@ -52,6 +56,12 @@ target 'restexpress' do
       :mac_catalyst_enabled => false,
       :ccache_enabled => podfile_properties['apple.ccacheEnabled'] == 'true',
     )
+
+    # Ensure C++20 for Folly compatibility
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++20'
+      end
+    end
   end
 end
-
