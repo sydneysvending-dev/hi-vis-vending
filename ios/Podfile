@@ -45,10 +45,8 @@ target 'restexpress' do
     :privacy_file_aggregation_enabled => podfile_properties['apple.privacyManifestAggregationEnabled'] != 'false',
   )
 
-  # ✅ Explicit Folly + RCT-Folly + Boost pins
-  pod 'RCT-Folly', :podspec => '../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec'
-  pod 'Folly', :git => 'https://github.com/facebook/folly.git', :tag => 'v2024.01.01.00'
-  pod 'boost', '1.76.0'
+  # 🚫 Do NOT declare Folly, RCT-Folly, or Boost here. RN 0.81 pulls prebuilt tarballs.
+  # Explicit pods were the cause of 'fast_float' and 'Coroutine.h' missing errors.
 
   post_install do |installer|
     react_native_post_install(
@@ -60,7 +58,6 @@ target 'restexpress' do
 
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|
-        # Ensure C++20 for Folly compatibility
         config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++20'
       end
     end
