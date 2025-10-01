@@ -1,3 +1,6 @@
+source 'https://github.com/CocoaPods/Specs.git'
+source 'https://cdn.cocoapods.org/'
+
 require File.join(File.dirname(`node --print "require.resolve('expo/package.json')"`), "scripts/autolinking")
 require File.join(File.dirname(`node --print "require.resolve('react-native/package.json')"`), "scripts/react_native_pods")
 
@@ -42,9 +45,6 @@ target 'restexpress' do
     :privacy_file_aggregation_enabled => podfile_properties['apple.privacyManifestAggregationEnabled'] != 'false',
   )
 
-  # Explicitly add Folly (fixes 'folly/coro/Coroutine.h' not found)
-  pod 'RCT-Folly', :podspec => File.join(config[:reactNativePath], 'third-party-podspecs', 'RCT-Folly.podspec')
-
   post_install do |installer|
     react_native_post_install(
       installer,
@@ -52,14 +52,6 @@ target 'restexpress' do
       :mac_catalyst_enabled => false,
       :ccache_enabled => podfile_properties['apple.ccacheEnabled'] == 'true',
     )
-
-    # Patch yoga::StyleLength.unit build error
-    installer.pods_project.targets.each do |target|
-      target.build_configurations.each do |config|
-        config.build_settings['OTHER_CPLUSPLUSFLAGS'] ||= ['$(inherited)']
-        config.build_settings['OTHER_CPLUSPLUSFLAGS'] << '-DRCT_NEW_ARCH_ENABLED=1'
-      end
-    end
   end
 end
 
